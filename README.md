@@ -22,3 +22,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+姑且记录一下开发过程
+2020.3.26使用vue-cli立项
