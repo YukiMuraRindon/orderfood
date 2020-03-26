@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>订餐系统</title>
+  </head>
+  <!--引入组件，缺少axios-->
+  <script src="./lib/vue.js"></script>
+  <script src="./lib/element.js"></script>
+  <link href="./lib/element.css" type="text/css" rel="stylesheet" />
+  <link href="./css/style.css" type="text/css" rel="stylesheet" />
+  <body>
+    <!--顶部菜单-->
+    <div class="head">
+      <img src="./img/logo.jpg" id="img" />
+      <div id="toplist">
+        <el-menu :default-active="activeIndex" class="el-menu" mode="horizontal" @select="handleSelect">
+          <el-menu-item index="1">菜品展示</el-menu-item>
+          <el-menu-item index="2">我的购物车</el-menu-item>
+          <el-menu-item index="3">订单管理</el-menu-item>
+        </el-menu>
+      </div>
+      <div id="user" v-on:click="link">
+        <el-avatar class="block"><el-avatar :size="41" :src="circleUrl"></el-avatar></el-avatar>
+      </div>
+    </div>
+    <hr id="line" />
+    <!--左侧菜单-->
+    <div id="leftlist">
+      <el-row class="tac">
+        <el-col>
+          <el-menu default-active="2">
+            <el-menu-item index="1">
+              <i class="el-icon-setting"></i>
+              <span slot="title"></span>全部菜系</el-menu-item
+            ><el-menu-item index="2">
+              <i class="el-icon-setting"></i>
+              <span slot="title">鲁菜</span> </el-menu-item
+            ><el-menu-item index="3">
+              <i class="el-icon-setting"></i>
+              <span slot="title">川菜</span>
+            </el-menu-item>
+            <el-menu-item index="4">
+              <i class="el-icon-setting"></i>
+              <span slot="title">粤菜</span>
+            </el-menu-item>
+            <el-menu-item index="5">
+              <i class="el-icon-setting"></i>
+              <span slot="title">苏菜</span>
+            </el-menu-item>
+            <el-menu-item index="6">
+              <i class="el-icon-setting"></i>
+              <span slot="title">闽菜</span>
+            </el-menu-item>
+            <el-menu-item index="7">
+              <i class="el-icon-setting"></i>
+              <span slot="title">浙菜</span>
+            </el-menu-item>
+            <el-menu-item index="8">
+              <i class="el-icon-setting"></i>
+              <span slot="title">徽菜</span>
+            </el-menu-item>
+            <el-menu-item index="9">
+              <i class="el-icon-setting"></i>
+              <span slot="title">湘菜</span>
+            </el-menu-item>
+          </el-menu>
+        </el-col>
+      </el-row>
+    </div>
+    <!--展示卡片-->
+    <div id="cards">
+      <el-row>
+        <el-col :span="8">
+          <el-card>
+            <img
+              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+              class="image"
+            />
+            <div style="padding: 14px;">
+              <span>好吃的汉堡</span>
+              <div class="bottom clearfix">
+                <el-button type="text" class="button">操作按钮</el-button>
+              </div>
+            </div>
+          </el-card>
+          <el-card>
+            <img
+              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+              class="image"
+            />
+            <div style="padding: 14px;">
+              <span>好吃的汉堡</span>
+              <div class="bottom clearfix">
+                <el-button type="text" class="button">操作按钮</el-button>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card>
+            <img
+              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+              class="image"
+            />
+            <div style="padding: 14px;">
+              <span>好吃的汉堡</span>
+              <div class="bottom clearfix">
+                <el-button type="text" class="button">操作按钮</el-button>
+              </div>
+            </div>
+          </el-card>
+          <el-card>
+            <img
+              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+              class="image"
+            />
+            <div style="padding: 14px;">
+              <span>好吃的汉堡</span>
+              <div class="bottom clearfix">
+                <el-button type="text" class="button">操作按钮</el-button>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card>
+            <img
+              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+              class="image"
+            />
+            <div style="padding: 14px;">
+              <span>好吃的汉堡</span>
+              <div class="bottom clearfix">
+                <el-button type="text" class="button">操作按钮</el-button>
+              </div>
+            </div>
+          </el-card>
+          <el-card>
+            <img
+              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+              class="image"
+            />
+            <div style="padding: 14px;">
+              <span>好吃的汉堡</span>
+              <div class="bottom clearfix">
+                <el-button type="text" class="button">操作按钮</el-button>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+    <!--底部菜单-->
+    <hr id="line" />
+    <div id="footer">
+      <p>酒店订餐系统 HOTEL RESERVATION SYSTEM © 2020</p>
+      <p>Powered and Maintained by Rindon . All Rights Reserved.</p>
+    </div>
+  </body>
+  <script>
+    var toplist = {
+      data() {
+        return {
+          activeIndex: "1",
+          activeIndex2: "1"
+        };
+      },
+      methods: {
+        handleSelect(key, keyPath) {
+          console.log(key, keyPath);
+        }
+      }
+    };
+    var user = {
+      data() {
+        return {
+          circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+        };
+      },
+      methods: {
+        link: function() {
+          self.location = "?2123";
+        }
+      }
+    };
+    var cards = {
+      data() {
+        return {};
+      }
+    };
+    var Ctor = Vue.extend(toplist);
+    new Ctor().$mount("#toplist");
+    var Ctor = Vue.extend(leftlist);
+    new Ctor().$mount("#leftlist");
+    var Ctor = Vue.extend(user);
+    new Ctor().$mount("#user");
+
+    var Ctor = Vue.extend(cards);
+    new Ctor().$mount("#cards");
+  </script>
+</html>
