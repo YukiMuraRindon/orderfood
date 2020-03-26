@@ -1,0 +1,30 @@
+html {
+  height: 100%;
+  width: 1000px;
+}
+.head{
+    width: 1000px;
+    height: 65px;
+}
+#toplist {
+  float: left;
+  width: 480px;
+}
+#img {
+  float: left;
+}
+#user {
+  float: right;
+  margin-top: 10px;
+}
+#line {
+  width: 1000px;
+}
+#data{
+    text-align: center;
+}
+#footer {
+    text-align: center;
+    font-size: 12px;
+  }
+  

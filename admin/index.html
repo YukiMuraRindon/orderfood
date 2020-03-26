@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>后台管理界面</title>
+  </head>
+  <!--引入组件，缺少axios-->
+  <script src="../lib/vue.js"></script>
+  <script src="../lib/element.js"></script>
+  <link href="../lib/element.css" type="text/css" rel="stylesheet" />
+  <link href="./css/style.css" type="text/css" rel="stylesheet" />
+  <body>
+    <!--顶部菜单-->
+    <div class="head">
+      <img src="../img/logo.jpg" id="img" />
+      <div id="toplist">
+        <el-menu :default-active="activeIndex" class="el-menu" mode="horizontal" @select="handleSelect">
+          <el-menu-item index="1">商品管理</el-menu-item>
+          <el-menu-item index="2">订单管理</el-menu-item>
+          <el-menu-item index="3">用户管理</el-menu-item>
+          <el-menu-item index="4">订单趋势</el-menu-item>
+          <el-menu-item index="5">数据统计</el-menu-item>
+        </el-menu>
+      </div>
+      <div id="user" v-on:click="link">
+        <el-avatar class="block"><el-avatar :size="41" :src="circleUrl"></el-avatar></el-avatar>
+      </div>
+    </div>
+    <!--数据加载-->
+    <div id="data">
+      <h3>商品数据</h3>
+      <el-table :data="tableData" border style="width: 100%">
+        <el-table-column prop="id" label="商品ID" width="180"> </el-table-column>
+        <el-table-column prop="name" label="商品名称" width="180"> </el-table-column>
+        <el-table-column prop="kind" label="商品类别"> </el-table-column>
+        <el-table-column prop="stock" label="库存"> </el-table-column>
+        <el-table-column prop="disc" label="商品描述"> </el-table-column>
+        <el-table-column prop="date" label="添加时间"></el-table-column>
+      </el-table>
+    </div>
+    <!--底部菜单-->
+    <hr id="line" />
+    <div id="footer">
+      <p>酒店订餐系统 HOTEL RESERVATION SYSTEM © 2020</p>
+      <p>Powered and Maintained by Rindon . All Rights Reserved.</p>
+    </div>
+  </body>
+  <script>
+    var toplist = {
+      data() {
+        return {
+          activeIndex: "1",
+          activeIndex2: "1"
+        };
+      },
+      methods: {
+        handleSelect(key, keyPath) {
+          console.log(key, keyPath);
+        }
+      }
+    };
+    var user = {
+      data() {
+        return {
+          circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+        };
+      },
+      methods: {
+        link: function() {
+          self.location = "?2123";
+        }
+      }
+    };
+    var data = {
+      data() {
+        return {
+          tableData: [
+            {
+              id: "1",
+              name: "菜品A",
+              kind: "鲁菜",
+              stock:"123",
+              disc:"好吃的一笔",
+              date:'2013-03-03',
+
+            },
+            {
+              id: "2",
+              name: "菜品B",
+              kind: "粤菜",
+              stock:"123",
+              disc:"好吃的一笔",
+              date:'2013-03-03',
+            },
+            {
+              id: "3",
+              name: "菜品C",
+              kind: "浙菜",
+              stock:"123",
+              disc:"好吃的一笔",
+              date:'2013-03-03',
+            },
+            {
+              id: "4",
+              name: "菜品D",
+              kind: "闽菜",
+              stock:"123",
+              disc:"好吃的一笔",
+              date:'2013-03-03',
+            }
+          ]
+        };
+      }
+    };
+    var Ctor = Vue.extend(data);
+    new Ctor().$mount("#data");
+    var Ctor = Vue.extend(toplist);
+    new Ctor().$mount("#toplist");
+    var Ctor = Vue.extend(user);
+    new Ctor().$mount("#user");
+  </script>
+</html>
