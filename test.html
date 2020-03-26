@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TestPage</title>
+</head>
+<style>
+    [v-cloak]{
+        display:none;
+    }
+</style>
+<script src="./lib/vue.js"></script>
+<body>
+    <div id="app">
+<!--
+    View层
+    如果用户的网速很慢，msg渲染之前会显示表达式，可以通过v-cloak的方式来避免
+    测试时可以通过选择network里面的slow3G看见
+    插值表达式可以拼接字符串，v-text会在渲染时直接覆盖，v-html可以插入HTML文本
+-->
+        <p v-cloak>
+            {{ msg }}
+        </p>
+        <p v-text="msg">
+        </p>
+
+        <div><p>{{ testmsg }}</p></div>
+        <div v-text="testmsg">111111112222222</div>
+        <div v-html="testmsg"></div>
+
+        <!--
+            v-bind可以绑定属性,只留冒号也有同样的用处，可以用合法表达式，msg是变量
+        -->
+        <input type="button" value="button" v-bind:title="msg + '123'">
+        <input type="button" value="button" :title="msg + '123'">
+        <br>
+        <!--
+            v-on可以绑定事件，执行method里面定义的函数，执行js，浏览器端常见的动作都可以定义，缩写是@
+        -->
+        <input type="button" value="button" v-on:click="show">
+        <input type="button" value="button" v-on:mouseover="show">
+    </div>
+    <!--
+            跑马灯（把第一个字放到最后)
+    -->
+    <div id="proj">
+        <input type="button" value="start" @click="start">
+        <input type="button" value="stop" @click="stop">
+        <p>{{ msg }}</p>
+    </div>    
+</body>
+<script>
+    //vm层
+    var vm = new Vue({
+        el:'#app',//控制的元素
+        data:{//相关数据，是M层
+            msg:'This is a test page',
+            testmsg:'<h1>一个标题</h1>'
+        },
+        methods:{
+            show:function(){
+                alert('test')
+            }
+        }
+
+    })
+    var test = new Vue({
+        el:'#proj',
+        data:{
+            msg:'这是一段测试语言',
+            intervalId:null
+        },
+        methods:{
+            start(){
+                if(this.intervalId != null) return;//防止点击次数多开启多个定时器
+                this.intervalId=setInterval(()=>{
+                    console.log(this.msg)
+                    var start = this.msg.substring(0,1)//把首字提取
+                    var end = this.msg.substring(1)//提取之后的
+                    this.msg = end + start//拼接
+                },400)//400ms执行一次
+            },
+            stop(){
+                clearInterval(this.intervalId)//清除定时器
+                this.intervalId = null
+            }  
+        }
+    })
+</script>
+</html>
