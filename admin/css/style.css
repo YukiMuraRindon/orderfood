@@ -21,7 +21,7 @@ a {
 }
 #toplist {
   float: left;
-  width: 480px;
+  width: 500px;
 }
 #img {
   float: left;
@@ -35,6 +35,9 @@ a {
 }
 #data {
   text-align: center;
+}
+#container{
+  height: 600px;
 }
 #footer {
   text-align: center;
