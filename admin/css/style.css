@@ -2,9 +2,26 @@ html {
   height: 100%;
   width: 1000px;
 }
-.head{
-    width: 1000px;
-    height: 65px;
+.head {
+  width: 1000px;
+  height: 65px;
+}
+a {
+  text-decoration: none;
+}
+.el-button{
+    float: left;
+    margin-right:-7px;
+}
+.input{
+    height:40px;
+    float:left;
+    display:inline-block;
+}
+#input{
+    width: 200px;
+    float:left;
+    display:inline-block;
 }
 #toplist {
   float: left;
@@ -20,11 +37,10 @@ html {
 #line {
   width: 1000px;
 }
-#data{
-    text-align: center;
+#data {
+  text-align: center;
 }
 #footer {
-    text-align: center;
-    font-size: 12px;
-  }
-  
+  text-align: center;
+  font-size: 12px;
+}

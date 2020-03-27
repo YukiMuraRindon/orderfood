@@ -30,27 +30,7 @@
         <el-avatar class="block"><el-avatar :size="41" :src="circleUrl"></el-avatar></el-avatar>
       </div>
     </div>
-    <!--数据加载-->
-    <div id="data">
-      <h3>商品数据</h3>
-      <div class="input">
-        <div><el-input v-model="input" placeholder="请输入内容" id="input"></el-input></div>
-        <div style="float:left;"><el-button type="primary">查询商品</el-button></div>
-        <div><el-button type="primary">增加商品</el-button></div>
-      </div>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="id" label="商品ID" width="80"> </el-table-column>
-        <el-table-column prop="name" label="商品名称" width="100"> </el-table-column>
-        <el-table-column prop="kind" label="商品类别" width="100"> </el-table-column>
-        <el-table-column prop="stock" label="库存" width="80"> </el-table-column>
-        <el-table-column prop="disc" label="商品描述"> </el-table-column>
-        <el-table-column prop="date" label="添加时间" width="100"></el-table-column>
-        <el-table-column prop="action" label="操作" id="action" :inline="true">
-          <el-button type="primary">删除商品</el-button>
-          <el-button type="primary">修改商品</el-button>
-        </el-table-column>
-      </el-table>
-    </div>
+
     <!--底部菜单-->
     <hr id="line" />
     <div id="footer">
@@ -58,12 +38,12 @@
       <p>Powered and Maintained by Rindon . All Rights Reserved.</p>
     </div>
   </body>
+
   <script>
     var toplist = {
       data() {
         return {
-          activeIndex: "1",
-          activeIndex2: "1"
+          activeIndex: "2",
         };
       },
       methods: {
@@ -84,49 +64,6 @@
         }
       }
     };
-    var data = {
-      data() {
-        return {
-          input: "",
-          tableData: [
-            {
-              id: "1",
-              name: "菜品A",
-              kind: "鲁菜",
-              stock: "123",
-              disc: "好吃的一笔",
-              date: "2013-03-03"
-            },
-            {
-              id: "2",
-              name: "菜品B",
-              kind: "粤菜",
-              stock: "123",
-              disc: "好吃的一笔",
-              date: "2013-03-03"
-            },
-            {
-              id: "3",
-              name: "菜品C",
-              kind: "浙菜",
-              stock: "123",
-              disc: "好吃的一笔",
-              date: "2013-03-03"
-            },
-            {
-              id: "4",
-              name: "菜品D",
-              kind: "闽菜",
-              stock: "123",
-              disc: "好吃的一笔",
-              date: "2013-03-03"
-            }
-          ]
-        };
-      }
-    };
-    var Ctor = Vue.extend(data);
-    new Ctor().$mount("#data");
     var Ctor = Vue.extend(toplist);
     new Ctor().$mount("#toplist");
     var Ctor = Vue.extend(user);
