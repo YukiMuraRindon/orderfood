@@ -11,10 +11,17 @@
  */
 namespace App\Http\Controllers;
 
+use App\Models\user;
+
+$users = user::all();
+
 class Selectapi extends Controller
 {
     public function test(){
-        return 'This is select api';
+        $users = user::all();
+        foreach($users as $user){
+            echo $user;
+        }
     }
     // 不是命令创建的类要更新autoload！！！！控制台指令：compuser dump-autoload！！！
 }
