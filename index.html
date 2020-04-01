@@ -41,130 +41,132 @@ Description:
     </div>
     <hr id="line" />
     <!--左侧菜单-->
-    <div id="leftlist">
-      <el-row class="tac">
-        <el-col>
-          <el-menu default-active="1">
-            <el-menu-item index="1">
-              <i class="el-icon-food"></i>
-              <span slot="title"></span>全部菜系</el-menu-item
-            ><el-menu-item index="2">
-              <i class="el-icon-dish-1"></i>
-              <span slot="title">鲁菜</span> </el-menu-item
-            ><el-menu-item index="3">
-              <i class="el-icon-dish"></i>
-              <span slot="title">川菜</span>
-            </el-menu-item>
-            <el-menu-item index="4">
-              <i class="el-icon-dish-1"></i>
-              <span slot="title">粤菜</span>
-            </el-menu-item>
-            <el-menu-item index="5">
-              <i class="el-icon-dish"></i>
-              <span slot="title">苏菜</span>
-            </el-menu-item>
-            <el-menu-item index="6">
-              <i class="el-icon-dish-1"></i>
-              <span slot="title">闽菜</span>
-            </el-menu-item>
-            <el-menu-item index="7">
-              <i class="el-icon-dish"></i>
-              <span slot="title">浙菜</span>
-            </el-menu-item>
-            <el-menu-item index="8">
-              <i class="el-icon-dish-1"></i>
-              <span slot="title">徽菜</span>
-            </el-menu-item>
-            <el-menu-item index="9">
-              <i class="el-icon-dish"></i>
-              <span slot="title">湘菜</span>
-            </el-menu-item>
-          </el-menu>
-        </el-col>
-      </el-row>
-    </div>
-    <!--展示卡片-->
-    <div id="cards">
-      <el-row>
-        <el-col :span="8">
-          <el-card>
-            <img
-              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-              class="image"
-            />
-            <div style="padding: 14px;">
-              <span>好吃的汉堡</span>
-              <div class="bottom clearfix">
-                <el-button type="text" class="button">操作按钮</el-button>
+    <div id=body>
+      <div id="leftlist">
+        <el-row class="tac">
+          <el-col>
+            <el-menu default-active="1">
+              <el-menu-item index="1">
+                <i class="el-icon-food"></i>
+                <span slot="title"></span>全部菜系</el-menu-item
+              ><el-menu-item index="2">
+                <i class="el-icon-dish-1"></i>
+                <span slot="title">鲁菜</span> </el-menu-item
+              ><el-menu-item index="3">
+                <i class="el-icon-dish"></i>
+                <span slot="title">川菜</span>
+              </el-menu-item>
+              <el-menu-item index="4">
+                <i class="el-icon-dish-1"></i>
+                <span slot="title">粤菜</span>
+              </el-menu-item>
+              <el-menu-item index="5">
+                <i class="el-icon-dish"></i>
+                <span slot="title">苏菜</span>
+              </el-menu-item>
+              <el-menu-item index="6">
+                <i class="el-icon-dish-1"></i>
+                <span slot="title">闽菜</span>
+              </el-menu-item>
+              <el-menu-item index="7">
+                <i class="el-icon-dish"></i>
+                <span slot="title">浙菜</span>
+              </el-menu-item>
+              <el-menu-item index="8">
+                <i class="el-icon-dish-1"></i>
+                <span slot="title">徽菜</span>
+              </el-menu-item>
+              <el-menu-item index="9">
+                <i class="el-icon-dish"></i>
+                <span slot="title">湘菜</span>
+              </el-menu-item>
+            </el-menu>
+          </el-col>
+        </el-row>
+      </div>
+      <!--展示卡片-->
+      <div id="cards">
+        <el-row>
+          <el-col :span="8">
+            <el-card>
+              <img
+                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                class="image"
+              />
+              <div style="padding: 14px;">
+                <span>好吃的汉堡</span>
+                <div class="bottom clearfix">
+                  <el-button type="text" class="button">操作按钮</el-button>
+                </div>
               </div>
-            </div>
-          </el-card>
-          <el-card>
-            <img
-              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-              class="image"
-            />
-            <div style="padding: 14px;">
-              <span>好吃的汉堡</span>
-              <div class="bottom clearfix">
-                <el-button type="text" class="button">操作按钮</el-button>
+            </el-card>
+            <el-card>
+              <img
+                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                class="image"
+              />
+              <div style="padding: 14px;">
+                <span>好吃的汉堡</span>
+                <div class="bottom clearfix">
+                  <el-button type="text" class="button">操作按钮</el-button>
+                </div>
               </div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card>
-            <img
-              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-              class="image"
-            />
-            <div style="padding: 14px;">
-              <span>好吃的汉堡</span>
-              <div class="bottom clearfix">
-                <el-button type="text" class="button">操作按钮</el-button>
+            </el-card>
+          </el-col>
+          <el-col :span="8">
+            <el-card>
+              <img
+                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                class="image"
+              />
+              <div style="padding: 14px;">
+                <span>好吃的汉堡</span>
+                <div class="bottom clearfix">
+                  <el-button type="text" class="button">操作按钮</el-button>
+                </div>
               </div>
-            </div>
-          </el-card>
-          <el-card>
-            <img
-              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-              class="image"
-            />
-            <div style="padding: 14px;">
-              <span>好吃的汉堡</span>
-              <div class="bottom clearfix">
-                <el-button type="text" class="button">操作按钮</el-button>
+            </el-card>
+            <el-card>
+              <img
+                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                class="image"
+              />
+              <div style="padding: 14px;">
+                <span>好吃的汉堡</span>
+                <div class="bottom clearfix">
+                  <el-button type="text" class="button">操作按钮</el-button>
+                </div>
               </div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card>
-            <img
-              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-              class="image"
-            />
-            <div style="padding: 14px;">
-              <span>好吃的汉堡</span>
-              <div class="bottom clearfix">
-                <el-button type="text" class="button">操作按钮</el-button>
+            </el-card>
+          </el-col>
+          <el-col :span="8">
+            <el-card>
+              <img
+                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                class="image"
+              />
+              <div style="padding: 14px;">
+                <span>好吃的汉堡</span>
+                <div class="bottom clearfix">
+                  <el-button type="text" class="button">操作按钮</el-button>
+                </div>
               </div>
-            </div>
-          </el-card>
-          <el-card>
-            <img
-              src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-              class="image"
-            />
-            <div style="padding: 14px;">
-              <span>好吃的汉堡</span>
-              <div class="bottom clearfix">
-                <el-button type="text" class="button">操作按钮</el-button>
+            </el-card>
+            <el-card>
+              <img
+                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                class="image"
+              />
+              <div style="padding: 14px;">
+                <span>好吃的汉堡</span>
+                <div class="bottom clearfix">
+                  <el-button type="text" class="button">操作按钮</el-button>
+                </div>
               </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
     </div>
     <!--底部菜单-->
     <hr id="line" />

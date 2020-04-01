@@ -39,8 +39,9 @@ html {
   color: blue !important;
 }
 #cards{
-  width: 100%;
+  width: 800px;
   height: 504px !important;
+  float: left;
 }
 .el-col{
     float: left;

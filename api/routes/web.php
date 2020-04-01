@@ -39,9 +39,8 @@ Route::prefix('commodity')->group(function(){
     Route::get('/',function(){
         return 'This is commodityApi';
     });
-    Route::get('select',function(){
-        return 'selectCommodityApi';
-    });
+    //查询所有商品
+    Route::get('select','selectcommodity@selectall');
 });
 
 Route::prefix('order')->group(function(){
@@ -57,5 +56,6 @@ Route::prefix('user')->group(function(){
     Route::get('/',function(){
         return 'This is UserApi';
     });
+    //等待重构：查询所有用户
     Route::get('select','Selectapi@test');
 });

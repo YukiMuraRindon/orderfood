@@ -1,8 +1,8 @@
 <?php
 /*
- * Created: 2020-03-31 10:37:49
- * Last Modified:2020-03-31 11:11:20
- * Filename:select.php
+ * Created: 2020-04-01 09:44:35
+ * Last Modified:2020-04-01 09:44:46
+ * Filename:selectcommdity.php
  * Project:api
  * Author : YukiMuraRindon
  * Email : rinndonn@outlook.com
@@ -11,15 +11,14 @@
  */
 namespace App\Http\Controllers;
 
-use App\Models\user;
+use App\Models\commodity;
 
-class Selectapi extends Controller
+class selectcommodity extends Controller
 {
-    public function test(){
-        $users = user::all();
-        foreach($users as $user){
-            echo $user;
-        }
+    public function selectall(){
+        $com = commodity::all();
+        return response()->json($com);
     }
     // 不是命令创建的类要更新autoload！！！！控制台指令：compuser dump-autoload！！！
 }
+
