@@ -16,14 +16,15 @@ Description:
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="YukiMuraRindon" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1" />
-    <link rel="Website icon" href="./img/favicon.ico" type="image/x-icon">
+    <link rel="Website icon" href="./img/favicon.ico" type="image/x-icon" />
     <title>订餐系统</title>
   </head>
   <!--引入组件，缺少axios-->
   <script src="./lib/vue.js"></script>
   <script src="./lib/element.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
   <link href="./css/style.css" type="text/css" rel="stylesheet" />
+  <script src="./lib/axios.js"></script>
   <body>
     <!--顶部菜单-->
     <div class="head">
@@ -41,7 +42,7 @@ Description:
     </div>
     <hr id="line" />
     <!--左侧菜单-->
-    <div id=body>
+    <div id="body">
       <div id="leftlist">
         <el-row class="tac">
           <el-col>
@@ -86,86 +87,26 @@ Description:
       </div>
       <!--展示卡片-->
       <div id="cards">
-        <el-row>
-          <el-col :span="8">
-            <el-card>
-              <img
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                class="image"
-              />
-              <div style="padding: 14px;">
-                <span>好吃的汉堡</span>
-                <div class="bottom clearfix">
-                  <el-button type="text" class="button">操作按钮</el-button>
-                </div>
-              </div>
-            </el-card>
-            <el-card>
-              <img
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                class="image"
-              />
-              <div style="padding: 14px;">
-                <span>好吃的汉堡</span>
-                <div class="bottom clearfix">
-                  <el-button type="text" class="button">操作按钮</el-button>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="8">
-            <el-card>
-              <img
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                class="image"
-              />
-              <div style="padding: 14px;">
-                <span>好吃的汉堡</span>
-                <div class="bottom clearfix">
-                  <el-button type="text" class="button">操作按钮</el-button>
-                </div>
-              </div>
-            </el-card>
-            <el-card>
-              <img
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                class="image"
-              />
-              <div style="padding: 14px;">
-                <span>好吃的汉堡</span>
-                <div class="bottom clearfix">
-                  <el-button type="text" class="button">操作按钮</el-button>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="8">
-            <el-card>
-              <img
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                class="image"
-              />
-              <div style="padding: 14px;">
-                <span>好吃的汉堡</span>
-                <div class="bottom clearfix">
-                  <el-button type="text" class="button">操作按钮</el-button>
-                </div>
-              </div>
-            </el-card>
-            <el-card>
-              <img
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                class="image"
-              />
-              <div style="padding: 14px;">
-                <span>好吃的汉堡</span>
-                <div class="bottom clearfix">
-                  <el-button type="text" class="button">操作按钮</el-button>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
+        <el-scrollbar :native="false" tag="section" style="height:100%;">
+          <el-row>
+              <el-col :span="8" v-for="commodity in info" class="commodity" :key="commodity.comid">
+                <el-card>
+                  <img :src="commodity.comimg" class="image" />
+                  <div style="padding: 14px;height: 200px;">
+                    <el-scrollbar :native="false" tag="section" style="height:100%;">
+                    <p>菜名：{{ commodity.comname }}</p>
+                    <p>菜种：{{ commodity.comkind }}:</p>
+                    <p>库存：{{ commodity.comstock }}</p>
+                    <p>{{ commodity.comdisc }}</p>
+                    <div class="bottom clearfix">
+                      <span>价格：{{ commodity.comprice }}&nbsp&nbsp&nbsp</span>
+                      <el-button type="text" class="button">加入购物车</el-button>
+                    </div>
+                  </el-scrollbar>
+                  </div>
+                </el-card>
+              </el-col>
+          </el-row>
       </div>
     </div>
     <!--底部菜单-->
@@ -203,9 +144,23 @@ Description:
     };
     var cards = {
       data() {
-        return {};
+        return {
+          info: null,
+          params:'all',
+        };
+      },
+      mounted() {
+        axios({
+          method: "get",
+          url: "http://192.168.2.201/commodity/select/"+this.params,
+        }) //执行get请求
+          .then(res => (this.info = res.data)) //处理数据（赋给info
+          .catch(error => {
+            console.log(error);
+          }); //错误处理
       }
     };
+
     var Ctor = Vue.extend(toplist);
     new Ctor().$mount("#toplist");
     var Ctor = Vue.extend(leftlist);

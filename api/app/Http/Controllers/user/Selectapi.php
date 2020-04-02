@@ -12,7 +12,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\user;
-
 class Selectapi extends Controller
 {
     public function test(){

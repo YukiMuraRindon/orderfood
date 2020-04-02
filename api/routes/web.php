@@ -40,7 +40,7 @@ Route::prefix('commodity')->group(function(){
         return 'This is commodityApi';
     });
     //查询所有商品
-    Route::get('select','selectcommodity@selectall');
+    Route::get('select/{kind?}','selectcommodity@selectall');
 });
 
 Route::prefix('order')->group(function(){
