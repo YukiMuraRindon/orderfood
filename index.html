@@ -25,10 +25,12 @@ Description:
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
   <link href="./css/style.css" type="text/css" rel="stylesheet" />
   <script src="./lib/axios.js"></script>
+
   <body>
     <!--顶部菜单-->
     <div class="head">
-      <img src="./img/logo.jpg" id="img" />
+        <img src="./img/logo.jpg" id="img" />
+      </div>
       <div id="toplist">
         <el-menu :default-active="activeIndex" class="el-menu" mode="horizontal" @select="handleSelect">
           <el-menu-item index="1">菜品展示</el-menu-item>
@@ -36,9 +38,60 @@ Description:
           <el-menu-item index="3">订单管理</el-menu-item>
         </el-menu>
       </div>
-      <div id="user" v-on:click="link">
-        <el-avatar class="block"><el-avatar :size="41" :src="circleUrl"></el-avatar></el-avatar>
+      <div id="user" style="margin-right:40px;">
+        <p style="margin-right:40px; text-align: center; display: inline;">  欢迎您：{{ nick }} </p>
+        <img src="./img/userlogo.png" alt="userlogo" style="width:50px;height:50px;" @click="pop = true" >
+        <el-popover
+          placement="top"
+          width="160"
+          v-model="pop">
+          <div style="text-align: right; margin: 0">
+            <el-button size="mini" @click="loginForm = true">登 录</el-button>
+            <el-button type="primary" size="mini" @click="registForm = true">注 册</el-button>
+        <!-- 登录表单 -->
+        <el-dialog title="登录系统" :visible.sync="loginForm" style="text-align:left" :modal-append-to-body="false">
+            <el-form :model="LoginForm">
+              <el-form-item label="用户名" :label-width="formLabelWidth">
+                <el-input v-model="LoginForm.username" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="密码" :label-width="formLabelWidth">
+                  <el-input v-model="LoginForm.password" autocomplete="off"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click.stop="clickcancal()">取 消</el-button>
+              <el-button type="primary" @click="clicklogin()">登 录</el-button>
+            </div>
+          </el-dialog>
+          <!-- 注册表单 -->
+        <el-dialog title="注册会员" :visible.sync="registForm" style="text-align:left" :modal-append-to-body="false">
+            <el-form :model="RegistForm">
+              <el-form-item label="用户名" :label-width="formLabelWidth">
+                <el-input v-model="RegistForm.username" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="密码" :label-width="formLabelWidth">
+                  <el-input v-model="RegistForm.password" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="确认密码" :label-width="formLabelWidth">
+                  <el-input v-model="RegistForm.repassword" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="昵称" :label-width="formLabelWidth">
+                  <el-input v-model="RegistForm.nickname" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="地址" :label-width="formLabelWidth">
+                  <el-input v-model="RegistForm.address" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="电话号码" :label-width="formLabelWidth">
+                  <el-input v-model="RegistForm.telephone" autocomplete="off"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click.stop="clickcancal()">取 消</el-button>
+              <el-button type="primary" @click="clickregist()">注 册</el-button>
+            </div>
+          </el-dialog>
       </div>
+      
     </div>
     <hr id="line" />
     <!--左侧菜单-->
@@ -46,18 +99,18 @@ Description:
       <div id="leftlist">
         <el-row class="tac">
           <el-col>
-            <el-menu default-active="1">
-              <el-menu-item index="1">
+            <el-menu :default-active="activeIndex">
+              <el-menu-item index="1"  v-on:click="selectall">
                 <i class="el-icon-food"></i>
-                <span slot="title"></span>全部菜系</el-menu-item
-              ><el-menu-item index="2">
+                <span slot="title">全部菜系</span></el-menu-item
+              ><el-menu-item index="2"  v-on:click="selectlu">
                 <i class="el-icon-dish-1"></i>
                 <span slot="title">鲁菜</span> </el-menu-item
-              ><el-menu-item index="3">
+              ><el-menu-item index="3" v-on:click="selectchuan">
                 <i class="el-icon-dish"></i>
                 <span slot="title">川菜</span>
               </el-menu-item>
-              <el-menu-item index="4">
+              <el-menu-item index="4" v-on:click="selectyue">
                 <i class="el-icon-dish-1"></i>
                 <span slot="title">粤菜</span>
               </el-menu-item>
@@ -95,8 +148,8 @@ Description:
                   <div style="padding: 14px;height: 200px;">
                     <el-scrollbar :native="false" tag="section" style="height:100%;">
                     <p>菜名：{{ commodity.comname }}</p>
-                    <p>菜种：{{ commodity.comkind }}:</p>
-                    <p>库存：{{ commodity.comstock }}</p>
+                    <p>菜种：{{ commodity.comkind }}</p>
+                    <p>剩余库存：{{ commodity.comstock }}</p>
                     <p>{{ commodity.comdisc }}</p>
                     <div class="bottom clearfix">
                       <span>价格：{{ commodity.comprice }}&nbsp&nbsp&nbsp</span>
@@ -133,42 +186,101 @@ Description:
     var user = {
       data() {
         return {
+          nick:"Guest",
+          pop : false,
+          loginForm: false,
+          registForm:false,
+          LoginForm: {
+            username: '',
+            password:'',
+          },
+          RegistForm:{
+            username:'',
+            password:'',
+            repassword:'',
+            nickname:'',
+            address:'',
+            telephone:'',
+          },
+        formLabelWidth: '120px',
           circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
         };
       },
       methods: {
-        link: function() {
-          self.location = "?2123";
-        }
-      }
-    };
-    var cards = {
-      data() {
-        return {
-          info: null,
-          params:'all',
-        };
-      },
-      mounted() {
-        axios({
-          method: "get",
-          url: "http://192.168.2.201/commodity/select/"+this.params,
-        }) //执行get请求
-          .then(res => (this.info = res.data)) //处理数据（赋给info
-          .catch(error => {
-            console.log(error);
-          }); //错误处理
-      }
-    };
+          clicklogin:function(){
+            this.pop = false;
+            this.loginForm = false;
+          },
+          clickregist:function(){
+            this.pop = false;
+            this.registForm = false;
+          },
+          clickcancal:function(){
+            this.pop = false;
+            this.registForm = false;
+            this.loginForm = false;
+          }          
+        },
+        watch: {
 
+        },
+    };
+    var body ={
+        data(){
+          return {
+            activeIndex: "1",
+            info: null,
+            params:'all',
+          };
+        },
+        methods: {
+          selectall:function(){
+            this.activeIndex = "1";
+            this.get('all');
+            //console.log('click 1');
+          },
+          selectlu:function(){
+            this.activeIndex = "2";
+            this.get('lu');
+            //console.log('click 2');
+          },
+          selectchuan:function(){
+            this.activeIndex = "3";
+            this.get('chuan');
+            //console.log('click 3');
+          },
+          selectyue:function(){
+            this.activeIndex = "4";
+            this.get('yue');
+            //console.log('click 4');
+          },
+          get:function(params){
+            axios({
+              method: "get",
+              url: "http://192.168.2.201/commodity/select/"+params,
+            }) //执行get请求
+            .then(res => (this.info = res.data)) //处理数据（赋给info
+            .catch(error => {
+              console.log(error);
+            }); //错误处理
+          }
+        },
+        mounted() {
+          axios({
+              method: "get",
+              url: "http://192.168.2.201/commodity/select/"+this.params,
+            }) //执行get请求
+            .then(res => (this.info = res.data)) //处理数据（赋给info
+            .catch(error => {
+              console.log(error);
+            }); //错误处理
+          }
+      };
     var Ctor = Vue.extend(toplist);
     new Ctor().$mount("#toplist");
-    var Ctor = Vue.extend(leftlist);
-    new Ctor().$mount("#leftlist");
+    var Ctor = Vue.extend(body);
+    new Ctor().$mount("#body");
     var Ctor = Vue.extend(user);
     new Ctor().$mount("#user");
-
-    var Ctor = Vue.extend(cards);
-    new Ctor().$mount("#cards");
   </script>
 </html>

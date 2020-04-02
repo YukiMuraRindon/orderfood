@@ -71,6 +71,8 @@ html {
 }
 #id {
   float: left;
+  height: 60px;
+
 }
 #footer {
   text-align: center;
