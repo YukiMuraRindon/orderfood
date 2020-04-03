@@ -11,7 +11,7 @@
 
 html {
   height: 100%;
-  width: 1000px;
+  width: 1200px;
 }
 .head {
   width: 1000px;
@@ -53,4 +53,8 @@ a {
 #footer {
   text-align: center;
   font-size: 12px;
+}
+.tableRow{
+  color: blue;
+  height: 70px!important;
 }

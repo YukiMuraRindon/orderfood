@@ -45,7 +45,7 @@ Description:
     <!--数据加载-->
     <div id="data">
       <h3>商品数据</h3>
-      <div style="width:203px;height:44px;text-align: center; margin-left: 392px;" :center="true">
+      <div style="width:203px;height:44px;text-align: center; margin-left: 490px;" :center="true">
         <el-button type="primary" @click="dialogFormVisible = true">查询商品</el-button>
         <!--查询商品的表单-->
         <el-dialog title="根据商品名称查询商品" :visible.sync="dialogFormVisible">
@@ -82,19 +82,23 @@ Description:
           </div>
         </el-dialog>
       </div>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="id" label="商品ID" width="80"> </el-table-column>
-        <el-table-column prop="name" label="商品名称" width="100"> </el-table-column>
-        <el-table-column prop="kind" label="商品类别" width="100"> </el-table-column>
-        <el-table-column prop="stock" label="商品库存" width="80"> </el-table-column>
-        <el-table-column prop="disc" label="商品描述"> </el-table-column>
-        <el-table-column prop="price" label="商品价格"> </el-table-column>
-        <el-table-column prop="date" label="添加时间" width="100"></el-table-column>
-        <el-table-column prop="action" label="操作" id="action" :inline="true" width="234">
-          <el-button type="primary">删除商品</el-button>
-          <el-button type="primary">修改商品</el-button>
-        </el-table-column>
-      </el-table>
+          <el-table :data="tableData" border style="width: 100%;" row-class-name="tableRow" height="700">
+            <el-table-column prop="comid" label="商品ID" width="50"> </el-table-column>
+            <el-table-column prop="comname" label="商品名称" width="100"> </el-table-column>
+            <el-table-column prop="comkind" label="商品类别" width="80"> </el-table-column>
+            <el-table-column prop="comstock" label="商品库存" width="80"> </el-table-column>
+            <div style="height:70px;">
+              <el-scrollbar :native="false" tag="section" style="height:100%;">
+                <el-table-column prop="comdisc" label="商品描述"  style="height:70px;"> </el-table-column>
+              </el-scrollbar>
+            </div>
+            <el-table-column prop="comprice" label="商品价格"width="80"> </el-table-column>
+            <el-table-column prop="comaddtime" label="添加时间" width="100"></el-table-column>
+            <el-table-column prop="action" label="操作" id="action" :inline="true" width="234">
+              <el-button type="primary">删除商品</el-button>
+              <el-button type="primary">修改商品</el-button>
+            </el-table-column>
+          </el-table>
     </div>
     <!--底部菜单-->
     <hr id="line" />
@@ -132,55 +136,30 @@ Description:
     var data = {
       data() {
         return {
+          params: "all",
+          tableData: [],
           dialogFormVisible: false,
           dialogFormVisible1: false,
           form: {
             name: "",
-            kind:"",
-            stock:"",
-            disc:"",
+            kind: "",
+            stock: "",
+            disc: ""
           },
           formLabelWidth: "120px",
           input: "",
-          tableData: [
-            {
-              id: "1",
-              name: "菜品A",
-              kind: "鲁菜",
-              stock: "123",
-              price:"333元",
-              disc: "好吃的一笔",
-              date: "2013-03-03"
-            },
-            {
-              id: "2",
-              name: "菜品B",
-              kind: "粤菜",
-              stock: "123",
-              price:"333元",
-              disc: "好吃的一笔",
-              date: "2013-03-03"
-            },
-            {
-              id: "3",
-              name: "菜品C",
-              kind: "浙菜",
-              stock: "123",
-              price:"333元",
-              disc: "好吃的一笔",
-              date: "2013-03-03"
-            },
-            {
-              id: "4",
-              name: "菜品D",
-              kind: "闽菜",
-              stock: "123",
-              price:"333元",
-              disc: "好吃的一笔",
-              date: "2013-03-03"
-            }
-          ]
+          tableData: [{}]
         };
+      },
+      mounted() {
+        axios({
+          method: "get",
+          url: "http://192.168.2.201/commodity/select/" + this.params
+        }) //执行get请求
+          .then(res => (this.tableData = res.data)) //处理数据（赋给info
+          .catch(error => {
+            console.log(error);
+          }); //错误处理
       }
     };
     var Ctor = Vue.extend(data);
