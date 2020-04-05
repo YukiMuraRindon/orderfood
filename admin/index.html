@@ -69,8 +69,11 @@ Description:
             <el-form-item label="商品名称" :label-width="formLabelWidth">
               <el-input v-model="form.name" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="商品类别" :label-width="formLabelWidth">
-              <el-input v-model="form.kind" autocomplete="off"></el-input>
+            <el-form-item label="商品种类" :label-width="formLabelWidth" v-model="form.kind">
+              <el-select v-model="form.kind" placeholder="请选择">
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="商品库存" :label-width="formLabelWidth">
               <el-input v-model="form.stock" autocomplete="off"></el-input>
@@ -78,10 +81,16 @@ Description:
             <el-form-item label="商品描述" :label-width="formLabelWidth">
               <el-input v-model="form.disc" autocomplete="off"></el-input>
             </el-form-item>
+            <el-form-item label="商品图片地址" :label-width="formLabelWidth">
+              <el-input v-model="form.img" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="商品价格" :label-width="formLabelWidth">
+              <el-input v-model="form.price" autocomplete="off"></el-input>
+            </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible1 = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible1 = false">添 加</el-button>
+            <el-button type="primary" @click="add">添 加</el-button>
           </div>
         </el-dialog>
       </div>
@@ -89,7 +98,8 @@ Description:
         <el-table-column prop="comid" label="商品ID" width="50"> </el-table-column>
         <el-table-column prop="comname" label="商品名称" width="100"> </el-table-column>
         <el-table-column prop="comkind" label="商品类别" width="80"> </el-table-column>
-        <el-table-column prop="comstock" label="商品库存" width="80"> </el-table-column>
+        <el-table-column prop="comstock" label="商品库存" width="80" placeholder="库存只能是数字！！！">
+        </el-table-column>
         <div style="height:70px;">
           <el-scrollbar :native="false" tag="section" style="height:100%;">
             <el-table-column prop="comdisc" label="商品描述" style="height:70px;"> </el-table-column>
@@ -144,7 +154,9 @@ Description:
             name: "",
             kind: "",
             stock: "",
-            disc: ""
+            disc: "",
+            img: "",
+            price: ""
           },
           formLabelWidth: "120px",
           input: "",
@@ -183,18 +195,71 @@ Description:
               label: "湘菜"
             }
           ],
-          value:'',
+          value: ""
         };
       },
       methods: {
         select: function() {
           this.dialogFormVisible = false;
-          if(this.value == ''){
-            this.value = 'all';
-          }else{
-          this.get(this.value);
+          if (this.value == "") {
+            this.value = "all";
+          } else {
+            this.get(this.value);
           }
           console.log();
+        },
+        add: function() {
+          if (isNaN(this.form.stock)) {
+            this.$alert("商品库存只能是数字！！", "请检查输入内容", {
+              confirmButtonText: "确定"
+            });
+            if (isNaN(this.form.price)) {
+              this.$alert("商品价格只能是数字和小数点！！", "请检查输入内容", {
+                confirmButtonText: "确定"
+              });
+            }
+            if (
+              //先检查是否有空值
+              this.form.name == "" ||
+              this.form.kind == "" ||
+              this.form.stock == "" ||
+              //库存只能为数字
+              this.form.disc == "" ||
+              this.form.img == "" ||
+              this.form.price == ""
+            ) {
+              this.$alert("不能有空字段，请重新输入！", "请检查输入内容", {
+                confirmButtonText: "确定"
+              });
+            }
+          } else {
+            (this.dialogFormVisible1 = false),
+              axios({
+                method: "post",
+                url: "http://192.168.2.201/commodity/insert/",
+                data: {
+                  name: this.form.name, //取值
+                  kind: this.form.kind,
+                  stock: this.form.stock,
+                  disc: this.form.disc,
+                  img: this.form.img,
+                  price: this.form.price
+                }
+              }) //执行get请求
+                .then(function(response) {
+                  //console.log(response);
+                }) //处理数据（赋给info
+                .catch(error => {
+                  console.log(error); //这里应该有错误处理
+                }); //错误处理
+            this.form.name = ""; //提交完成后归空
+            this.form.kind = "";
+            this.form.stock = "";
+            this.form.disc = "";
+            this.form.img = "";
+            this.form.price = "";
+            this.get("all"); //插入完毕刷新页面
+          }
         },
         get: function(value) {
           axios({

@@ -19,4 +19,6 @@ class commodity extends Model
     protected $table = 'commodity';
     //无需维护时间戳
     public $timestamps = false;
+    protected $primaryKey = 'comid';
+
 }
