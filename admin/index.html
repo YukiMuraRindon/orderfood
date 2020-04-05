@@ -110,40 +110,42 @@ Description:
         <el-table-column prop="action" label="操作" id="action" :inline="true" width="234">
           <template slot-scope="scope">
             <el-button type="primary" @click="del(scope.row.comid)">删除商品</el-button>
-            <el-button type="primary" @click="upadteFormVisible = true">修改商品</el-button>
+            <el-button type="primary" @click="updateShow(scope.row)">修改商品</el-button>
           </template>
         </el-table-column>
       </el-table>
       <!--修改商品的表单-->
       <el-dialog title="修改商品信息" :visible.sync="upadteFormVisible">
-          <el-form :model="upform">
-            <el-form-item label="商品名称" :label-width="formLabelWidth">
-              <el-input v-model="upform.name" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="商品种类" :label-width="formLabelWidth" v-model="upform.kind">
-              <el-select v-model="upform.kind" placeholder="请选择">
-                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="商品库存" :label-width="formLabelWidth">
-              <el-input v-model="upform.stock" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="商品描述" :label-width="formLabelWidth">
-              <el-input v-model="upform.disc" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="商品图片地址" :label-width="formLabelWidth">
-              <el-input v-model="upform.img" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="商品价格" :label-width="formLabelWidth">
-              <el-input v-model="upform.price" autocomplete="off"></el-input>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="upadteFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="update">修 改</el-button>
-          </div>
-        </el-dialog>
+        <el-form :model="upform">
+          <el-form-item label="商品id" :label-width="formLabelWidth">
+            <el-input v-model="upform.id" autocomplete="off" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="商品名称" :label-width="formLabelWidth">
+            <el-input v-model="upform.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="商品种类" :label-width="formLabelWidth" v-model="upform.kind">
+            <el-select v-model="upform.kind" placeholder="请选择">
+              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="商品库存" :label-width="formLabelWidth">
+            <el-input v-model="upform.stock" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="商品描述" :label-width="formLabelWidth">
+            <el-input v-model="upform.disc" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="商品图片地址" :label-width="formLabelWidth">
+            <el-input v-model="upform.img" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="商品价格" :label-width="formLabelWidth">
+            <el-input v-model="upform.price" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="upadteFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="update">修 改</el-button>
+        </div>
+      </el-dialog>
     </div>
     <!--底部菜单-->
     <hr id="line" />
@@ -162,7 +164,7 @@ Description:
       },
       methods: {
         handleSelect(key, keyPath) {
-          console.log(key, keyPath);
+          //console.log(key, keyPath);
         }
       }
     };
@@ -191,8 +193,8 @@ Description:
             img: "",
             price: ""
           },
-          upform:{
-            id:"",
+          upform: {
+            id: "",
             name: "",
             kind: "",
             stock: "",
@@ -250,7 +252,7 @@ Description:
           } else {
             this.get(this.value);
           }
-          console.log();
+          //console.log();
         },
         add: function() {
           //添加商品方法
@@ -292,29 +294,81 @@ Description:
                 }
               }) //执行get请求
                 .then(function(response) {
+                  //this.get("all"); //插入完毕刷新页面
                   //console.log(response);
                 }) //处理数据（赋给info
                 .catch(error => {
                   console.log(error); //这里应该有错误处理
                 }); //错误处理
+            this.get("all");
             this.form.name = ""; //提交完成后归空
             this.form.kind = "";
             this.form.stock = "";
             this.form.disc = "";
             this.form.img = "";
             this.form.price = "";
+            this.$alert("添加成功", "商品添加成功", {
+              confirmButtonText: "确定"
+            });
             this.get("all"); //插入完毕刷新页面
           }
         },
         del: function(comid) {
-          console.log(comid);
+          //console.log(comid);
+          this.$confirm("此操作将永久删除该商品的信息, 是否继续?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          })
+            .then(() => {
+              axios({
+                method: "post",
+                url: "http://192.168.2.201/commodity/deletecom/",
+                data: {
+                  id: comid
+                }
+              }) //执行get请求
+                .then(function(response) {
+                  //this.get("all"); //插入完毕刷新页面
+                }) //处理数据（赋给info
+                .catch(error => {
+                  console.log(error); //这里应该有错误处理
+                }); //错误处理
+              //执行完毕后刷新表格
+              this.$alert("删除成功", "删除商品成功", {
+                confirmButtonText: "确定"
+              });
+              this.get("all");
+            })
+            .catch(() => {});
+          this.get("all");
+        },
+        updateShow: function(row) {
+          //将行数据放入表格
+          this.upadteFormVisible = true;
+          this.upform.id = row.comid;
+          this.upform.name = row.comname;
+          this.upform.kind = row.comkind;
+          this.upform.stock = row.comstock;
+          this.upform.disc = row.comdisc;
+          this.upform.img = row.comimg;
+          this.upform.price = row.comprice;
+        },
+        update: function() {
+          //console.log(this.upform.name,this.upform.id,this.upform.stock);
           axios({
             method: "post",
-            url: "http://192.168.2.201/commodity/deletecom/",
+            url: "http://192.168.2.201/commodity/updatecom/",
             data: {
-              id: comid
+              id: this.upform.id,
+              name: this.upform.name,
+              kind: this.upform.kind,
+              stock: this.upform.stock,
+              disc: this.upform.disc,
+              img: this.upform.img,
+              price: this.upform.price
             }
-          }) //执行get请求
+          }) //执行请求
             .then(function(response) {
               //console.log(response);
             }) //处理数据（赋给info
@@ -322,10 +376,11 @@ Description:
               console.log(error); //这里应该有错误处理
             }); //错误处理
           //执行完毕后刷新表格
+          this.$alert("修改成功", "商品信息修改成功", {
+            confirmButtonText: "确定"
+          });
+          this.upadteFormVisible = false;
           this.get("all");
-        },
-        update:function(){
-          ;
         },
         get: function(value) {
           //重新获取商品信息

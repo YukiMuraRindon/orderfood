@@ -43,6 +43,7 @@ Route::prefix('commodity')->group(function(){
     Route::get('select/{kind?}','selectcommodity@selectall');
     Route::post('insert/','commodity\insert@insertcommodity');
     Route::post('deletecom/','commodity\deletecom@deletecom');
+    Route::post('updatecom/','commodity\updatecom@updatecom');
 });
 
 Route::prefix('order')->group(function(){
