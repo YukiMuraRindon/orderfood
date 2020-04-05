@@ -51,17 +51,18 @@ class insert extends Controller
         // $this->img = $img;
         // $this->price = $price;
         // $this->save();
+        //Eloquent还没搞懂，先用构造器
         //执行查询构造器
-        // DB::table('commodity')->insert(
-        //     [
-        //         'comname' => $name,
-        //         'comkind' => $kind,
-        //         'comstock' => $stock,
-        //         'comdisc' => $disc,
-        //         'comimg' => $img,
-        //         'comprice' => $price
-        //     ]
-        // );
+        DB::table('commodity')->insert(
+            [
+                'comname' => $name,
+                'comkind' => $kind,
+                'comstock' => $stock,
+                'comdisc' => $disc,
+                'comimg' => $img,
+                'comprice' => $price
+            ]
+        );
         return 1;
     }
 }

@@ -42,6 +42,7 @@ Route::prefix('commodity')->group(function(){
     //查询所有商品
     Route::get('select/{kind?}','selectcommodity@selectall');
     Route::post('insert/','commodity\insert@insertcommodity');
+    Route::post('deletecom/','commodity\deletecom@deletecom');
 });
 
 Route::prefix('order')->group(function(){
