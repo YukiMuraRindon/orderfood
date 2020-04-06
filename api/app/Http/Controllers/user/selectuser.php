@@ -9,15 +9,23 @@
  * --------------------------------------------------------
  * Description: 
  */
+
 namespace App\Http\Controllers;
 
 use App\Models\user;
-class Selectapi extends Controller
+
+class selectuser extends Controller
 {
-    public function test(){
-        $users = user::all();
-        foreach($users as $user){
-            echo $user;
+    public function selectuser($username)
+    {
+        if($username == "all"){
+            $users = user::all();
+            return response()->json($users);
+        }
+        else{
+            $users = user::where("username",$username)->get();
+            return response()->json($users);
+            ;//根据用户名查用户
         }
     }
     // 不是命令创建的类要更新autoload！！！！控制台指令：compuser dump-autoload！！！

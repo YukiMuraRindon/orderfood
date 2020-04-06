@@ -59,6 +59,8 @@ Route::prefix('user')->group(function(){
     Route::get('/',function(){
         return 'This is UserApi';
     });
-    //等待重构：查询所有用户
-    Route::get('select','Selectapi@test');
+    Route::get('selectuser/{username}','selectuser@selectuser');
+    Route::post('insertuser/','user\insertuser@insertuser');
+    Route::post('deleteuser/','user\deleteuser@deleteuser');
+    Route::post('updateuser/','user\updateuser@updateuser');
 });

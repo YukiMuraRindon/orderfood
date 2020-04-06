@@ -39,7 +39,7 @@ Description:
           <el-menu-item index="5"><a href="#">数据统计</a></el-menu-item>
         </el-menu>
       </div>
-      <div id="user" v-on:click="link">
+      <div id="user">
         <el-avatar class="block"><el-avatar :size="41" :src="circleUrl"></el-avatar></el-avatar>
       </div>
     </div>
@@ -48,27 +48,27 @@ Description:
       <h3>用户数据</h3>
       <div style="width:203px;height:44px;text-align: center; margin-left: 490px;" :center="true">
         <el-button type="primary" @click="dialogFormVisible = true">查询用户</el-button>
-        <!--查询商品的表单-->
+        <!--查询用户的表单-->
         <el-dialog title="根据用户名查询用户" :visible.sync="dialogFormVisible">
           <el-form :model="form">
             <el-form-item label="用户名" :label-width="formLabelWidth">
-              <el-input v-model="form.name" autocomplete="off"></el-input>
+              <el-input v-model="username" autocomplete="off"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false">查 询</el-button>
+            <el-button type="primary" @click="selectuser">查 询</el-button>
           </div>
         </el-dialog>
         <el-button type="primary" @click="dialogFormVisible1 = true">增加用户</el-button>
-        <!--添加商品的表单-->
+        <!--添加用户的表单-->
         <el-dialog title="增加新的用户" :visible.sync="dialogFormVisible1">
           <el-form :model="form">
             <el-form-item label="用户名" :label-width="formLabelWidth">
               <el-input v-model="form.username" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="密码" :label-width="formLabelWidth">
-              <el-input v-model="form.pwd" autocomplete="off"></el-input>
+              <el-input v-model="form.password" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="昵称" :label-width="formLabelWidth">
               <el-input v-model="form.nickname" autocomplete="off"></el-input>
@@ -82,23 +82,56 @@ Description:
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible1 = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible1 = false">添 加</el-button>
+            <el-button type="primary" @click="insertuser">添 加</el-button>
           </div>
         </el-dialog>
       </div>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="id" label="用户编号" width="80"> </el-table-column>
+      <el-table :data="tableData" border style="width: 100%" row-class-name="tableRow">
+        <el-table-column prop="userid" label="用户编号" width="80"> </el-table-column>
         <el-table-column prop="username" label="用户名" width="100"> </el-table-column>
-        <el-table-column prop="pwd" label="密码" width="100"> </el-table-column>
+        <el-table-column prop="password" label="密码" width="100"> </el-table-column>
         <el-table-column prop="nickname" label="昵称" width="80"> </el-table-column>
-        <el-table-column prop="tel" label="联系方式"> </el-table-column>
+        <el-table-column prop="tel" label="电话号码"> </el-table-column>
         <el-table-column prop="address" label="配送地址"> </el-table-column>
-        <el-table-column prop="status" label="激活状态" width="100"></el-table-column>
+        <el-table-column prop="status" label="用户状态" width="100"></el-table-column>
+        <el-table-column prop="useraddtime" label="注册时间" width="100"></el-table-column>
         <el-table-column prop="action" label="操作" id="action" :inline="true" width="234">
-          <el-button type="primary">删除用户</el-button>
-          <el-button type="primary">修改用户</el-button>
+          <template slot-scope="scope">
+            <el-button type="primary" @click="deleteuser(scope.row.userid)">删除用户</el-button>
+            <el-button type="primary" @click="updateShow(scope.row)">修改用户</el-button>
+          </template>
         </el-table-column>
       </el-table>
+      <!-- 修改用户表单 -->
+      <el-dialog title="修改用户信息" :visible.sync="upadteFormVisible">
+        <el-form :model="updateform">
+          <el-form-item label="用户id" :label-width="formLabelWidth">
+            <el-input v-model="updateform.userid" autocomplete="off" :disabled="true"></el-input>
+          </el-form-item>
+          <el-form-item label="用户名" :label-width="formLabelWidth">
+            <el-input v-model="updateform.username" autocomplete="off" ></el-input>
+          </el-form-item>
+          <el-form-item label="用户密码" :label-width="formLabelWidth">
+            <el-input v-model="updateform.password" autocomplete="off" ></el-input>
+          </el-form-item>
+          <el-form-item label="用户昵称" :label-width="formLabelWidth">
+            <el-input v-model="updateform.nickname" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="电话号码" :label-width="formLabelWidth">
+            <el-input v-model="updateform.tel" autocomplete="off" ></el-input>
+          </el-form-item>
+          <el-form-item label="用户地址" :label-width="formLabelWidth">
+            <el-input v-model="updateform.address" autocomplete="off" ></el-input>
+          </el-form-item>
+          <el-form-item label="用户状态" :label-width="formLabelWidth">
+            <el-input v-model="updateform.status" autocomplete="off" :disabled="true"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="upadteFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="updateuser">修 改</el-button>
+        </div>
+      </el-dialog>
     </div>
     <!--底部菜单-->
     <hr id="line" />
@@ -138,63 +171,149 @@ Description:
         return {
           dialogFormVisible: false,
           dialogFormVisible1: false,
+          upadteFormVisible: false,
           form: {
             username: "",
-            pwd: "",
+            password: "",
             nickname: "",
             tel: "",
             address: ""
           },
+          updateform: {
+            userid: "",
+            username: "",
+            password: "",
+            nickname: "",
+            tel: "",
+            address: "",
+            status: ""
+          },
           formLabelWidth: "120px",
           input: "",
-          tableData: [
-            {
-              id: "10001",
-              username: "Xhshsh",
-              pwd: "shshshshs11",
-              nickname: "张三",
-              tel: "13333333333",
-              address: "A街B区C省D市EEEEEEEEEEEEE",
-              status: "Active"
-            },
-            {
-              id: "10002",
-              username: "Xhshsh",
-              pwd: "shshshshs11",
-              nickname: "张三",
-              tel: "13333333333",
-              address: "A街B区C省D市EEEEEEEEEEEEE",
-              status: "Active"
-            },
-            {
-              id: "10003",
-              username: "Xhshsh",
-              pwd: "shshshshs11",
-              nickname: "张三",
-              tel: "13333333333",
-              address: "A街B区C省D市EEEEEEEEEEEEE",
-              status: "Active"
-            },
-            {
-              id: "10004",
-              username: "Xhshsh",
-              pwd: "shshshshs11",
-              nickname: "张三",
-              tel: "13333333333",
-              address: "A街B区C省D市EEEEEEEEEEEEE",
-              status: "Active"
-            },
-            {
-              id: "10005",
-              username: "Xhshsh",
-              pwd: "shshshshs11",
-              nickname: "张三",
-              tel: "13333333333",
-              address: "A街B区C省D市EEEEEEEEEEEEE",
-              status: "Active"
-            }
-          ]
+          tableData: [{}],
+          username: "all"
         };
+      },
+      methods: {
+        selectuser: function(username) {
+          //console.log(this.username);
+          this.dialogFormVisible = false;
+          this.get(this.username);
+          this.username = "all";
+        },
+        insertuser: function() {
+          if (isNaN(this.form.tel)) {
+            this.$alert("电话号码只能是数字！！", "请检查输入内容", {
+              confirmButtonText: "确定"
+            });
+          } else {
+            this.dialogFormVisible1 = false;
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/user/insertuser/",
+              data: {
+                username: this.form.username,
+                password: this.form.password,
+                nickname: this.form.nickname,
+                tel: this.form.tel,
+                address: this.form.address
+              }
+            }) //执行get请求
+              .then(function(response) {
+                //this.get("all"); //插入完毕刷新页面
+                //console.log(response);
+              }) //处理数据（赋给info
+              .catch(error => {
+                console.log(error); //这里应该有错误处理
+              }); //错误处理
+            this.$alert("添加成功", "用户添加成功", {
+              confirmButtonText: "确定"
+            });
+          }
+        },
+        deleteuser: function(userid) {
+          this.$confirm("此操作将永久删除该用户的信息, 是否继续?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          })
+            .then(() => {
+              axios({
+                method: "post",
+                url: "http://192.168.2.201/user/deleteuser/",
+                data: {
+                  userid: userid
+                }
+              }) //执行get请求
+                .then(function(response) {
+                  //this.get("all"); //插入完毕刷新页面
+                }) //处理数据（赋给info
+                .catch(error => {
+                  console.log(error); //这里应该有错误处理
+                }); //错误处理
+              this.$alert("删除成功", "删除用户成功", {
+                confirmButtonText: "确定"
+              });
+            })
+            .catch(() => {});
+        },
+        updateShow: function(row) {
+          this.upadteFormVisible = true;
+          this.updateform.userid = row.userid;
+          this.updateform.username = row.username;
+          this.updateform.password = row.password;
+          this.updateform.nickname = row.nickname;
+          this.updateform.tel = row.tel;
+          this.updateform.address = row.address;
+          this.updateform.status = row.status;
+        },
+        updateuser: function(){
+          axios({
+            method: "post",
+            url: "http://192.168.2.201/user/updateuser/",
+            data: {
+              userid: this.updateform.userid,
+              username: this.updateform.username,
+              password: this.updateform.password,
+              nickname: this.updateform.nickname,
+              tel: this.updateform.tel,
+              address: this.updateform.address
+            }
+          }) //执行请求
+            .then(function(response) {
+              //console.log(response);
+            }) //处理数据（赋给info
+            .catch(error => {
+              console.log(error); //这里应该有错误处理
+            }); //错误处理
+          //执行完毕后刷新表格
+          this.$alert("修改成功", "用户信息修改成功", {
+            confirmButtonText: "确定"
+          });
+          this.upadteFormVisible = false;
+          this.get("all");
+        },
+        get: function(username) {
+          //获取用户信息
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/user/selectuser/" + username
+          }) //执行get请求
+            .then(res => (this.tableData = res.data)) //处理数据（赋给info
+            .catch(error => {
+              console.log(error);
+            }); //错误处理
+        }
+      },
+      mounted() {
+        axios({
+          method: "get",
+          url: "http://192.168.2.201/user/selectuser/" + this.username
+        }) //执行get请求
+          .then(res => (this.tableData = res.data)) //处理数据（赋给info
+          .catch(error => {
+            console.log(error);
+          }); //错误处理
       }
     };
     var Ctor = Vue.extend(data);
