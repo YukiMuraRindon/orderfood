@@ -52,7 +52,7 @@ Description:
         <el-dialog title="根据订单号查询商品" :visible.sync="dialogFormVisible">
           <el-form :model="form">
             <el-form-item label="订单号" :label-width="formLabelWidth">
-              <el-input v-model="form.id" autocomplete="off"></el-input>
+              <el-input v-model="orderid" autocomplete="off"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -60,40 +60,17 @@ Description:
             <el-button type="primary" @click="dialogFormVisible = false">查 询</el-button>
           </div>
         </el-dialog>
-        <el-button type="primary" @click="dialogFormVisible1 = true">增加订单</el-button>
-        <!--添加商品的表单-->
-        <el-dialog title="增加新的订单" :visible.sync="dialogFormVisible1">
-          <el-form :model="form">
-            <el-form-item label="购买商品" :label-width="formLabelWidth">
-              <el-input v-model="form.commodity" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="购买数量" :label-width="formLabelWidth">
-              <el-input v-model="form.num" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="订单状态" :label-width="formLabelWidth">
-              <el-input v-model="form.orderstatus" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="物流状态" :label-width="formLabelWidth">
-              <el-input v-model="form.sentstatus" autocomplete="off"></el-input>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible1 = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible1 = false">添 加</el-button>
-          </div>
-        </el-dialog>
       </div>
       <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="id" label="订单编号" width="80"> </el-table-column>
-        <el-table-column prop="commodity" label="购买商品" width="100"> </el-table-column>
-        <el-table-column prop="num" label="购买数量" width="100"> </el-table-column>
-        <el-table-column prop="orderstatus" label="订单状态" width="80"> </el-table-column>
-        <el-table-column prop="sentstatus" label="物流状态"> </el-table-column>
-        <el-table-column prop="allprice" label="总价格"> </el-table-column>
-        <el-table-column prop="date" label="添加时间" width="100"></el-table-column>
+        <el-table-column prop="orderid" label="订单编号" width="80"> </el-table-column>
+        <el-table-column prop="userid" label="用户编号" width="80"> </el-table-column>
+        <el-table-column prop="ordprice" label="订单总价" width="100"> </el-table-column>
+        <el-table-column prop="ordstatus" label="订单状态" width="80"> </el-table-column>
+        <el-table-column prop="orddate" label="下单时间"> </el-table-column>
+        <el-table-column prop="sentstatus" label="配送状态"> </el-table-column>
         <el-table-column prop="action" label="操作" id="action" :inline="true" width="234">
-          <el-button type="primary">删除商品</el-button>
-          <el-button type="primary">修改商品</el-button>
+          <el-button type="primary">开始派送</el-button>
+          <el-button type="primary">修改订单</el-button>
         </el-table-column>
       </el-table>
     </div>
@@ -135,52 +112,38 @@ Description:
         return {
           dialogFormVisible: false,
           dialogFormVisible1: false,
-          form: {
-            id: "",
-            commodity:"",
-            num:"",
-            orderstatus:"waiting",
-            sentstatus:"waiting",
-          },
+          orderid:"all",
           formLabelWidth: "120px",
           input: "",
-          tableData: [
-            {
-              id: "1",
-              commodity: "菜品A",
-              num: "12",
-              orderstatus: "waiting",
-              sentstatus:"waiting",
-              allprice: "12123",
-              date: "2013-03-03"
-            },
-            {
-              id: "2",
-              commodity: "菜品A",
-              num: "12",
-              orderstatus: "waiting",
-              sentstatus:"waiting",
-              allprice: "12123",
-              date: "2013-03-03"
-            },{
-              id: "3",
-              commodity: "菜品A",
-              num: "12",
-              orderstatus: "making",
-              sentstatus:"waiting",
-              allprice: "12123",
-              date: "2013-03-03"
-            },{
-              id: "4",
-              commodity: "菜品A",
-              num: "12",
-              orderstatus: "sending",
-              sentstatus:"sending",
-              allprice: "12123",
-              date: "2013-03-03"
-            },
-          ]
+          tableData: null,
+          form:null
         };
+      },
+      methods: {
+        get: function(orderid) {
+          //获取订单信息
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/order/selectorder/" + orderid
+          }) //执行get请求
+            .then(res => (this.tableData = res.data)) //处理数据（赋给info
+            .catch(error => {
+              //console.log(res.data);
+              console.log(error);
+            }); //错误处理
+        }
+      },
+      mounted() {
+        axios({
+          method: "get",
+          url: "http://192.168.2.201/order/selectorder/" + this.orderid
+        }) //执行get请求
+          .then(res => (this.tableData = res.data)) //处理数据（赋给info
+          .catch(error => {
+            console.log(error);
+          }); //错误处理
+          //console.log(this.tableData);
+
       }
     };
     var Ctor = Vue.extend(data);

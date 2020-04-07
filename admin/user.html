@@ -150,7 +150,7 @@ Description:
       },
       methods: {
         handleSelect(key, keyPath) {
-          console.log(key, keyPath);
+          //console.log(key, keyPath);
         }
       }
     };
@@ -161,9 +161,7 @@ Description:
         };
       },
       methods: {
-        link: function() {
-          self.location = "?2123";
-        }
+
       }
     };
     var data = {
@@ -190,7 +188,7 @@ Description:
           },
           formLabelWidth: "120px",
           input: "",
-          tableData: [{}],
+          tableData: null,
           username: "all"
         };
       },
@@ -301,6 +299,7 @@ Description:
           }) //执行get请求
             .then(res => (this.tableData = res.data)) //处理数据（赋给info
             .catch(error => {
+              //console.log(res.data);
               console.log(error);
             }); //错误处理
         }
@@ -314,6 +313,8 @@ Description:
           .catch(error => {
             console.log(error);
           }); //错误处理
+          //console.log(this.tableData);
+
       }
     };
     var Ctor = Vue.extend(data);

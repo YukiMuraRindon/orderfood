@@ -13,17 +13,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\user;
+use Illuminate\Support\Facades\DB;
+
 
 class selectuser extends Controller
 {
     public function selectuser($username)
     {
         if($username == "all"){
-            $users = user::all();
+            $users = DB::table('user')->where('status', 1)->get();
             return response()->json($users);
         }
         else{
-            $users = user::where("username",$username)->get();
+            $users = user::where([["username",$username],["status",1]])->get();
             return response()->json($users);
             ;//根据用户名查用户
         }

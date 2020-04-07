@@ -13,7 +13,11 @@ class deletecom extends Controller
         // return "This is del API";
         $id = $request->input('id');
         //return $id;
-        DB::table('commodity')->where('comid', '=', $id)->delete();
+        DB::table('commodity')
+            ->where('comid', $id)
+            ->update([
+                'status' => '0'
+            ]);
         return 'done';
     }
 }

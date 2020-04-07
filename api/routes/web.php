@@ -50,9 +50,7 @@ Route::prefix('order')->group(function(){
     Route::get('/',function(){
         return 'This is OrderApi';
     });
-    Route::get('select',function(){
-        return 'selectOrderApi';
-    });
+    Route::get('selectorder/{id?}','order\selectorder@selectorder');
 });
 
 Route::prefix('user')->group(function(){

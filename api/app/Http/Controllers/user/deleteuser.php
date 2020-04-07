@@ -13,8 +13,13 @@ class deleteuser extends Controller
         //  return "This is del API";
          $id = $request->input('userid');
          //return $id;
-         DB::table('user')->where('userid', '=', $id)->delete();
+        //  DB::table('user')->where('userid', '=', $id)->delete();
+        DB::table('user')
+            ->where('userid', $id)
+            ->update([
+                'status' => '0'
+            ]);
          return 'done';
-         //推荐把用户状态改为0，然后selectall的时候只搜1和2
+         //用户状态改为0，然后selectall的时候只搜1和2
     }
 }
