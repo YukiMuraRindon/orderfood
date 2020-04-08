@@ -8,14 +8,17 @@ use Illuminate\Support\Facades\DB;
 
 class updateorder extends Controller
 {
-    public function updatestatus(Request $request){
+    public function updatestatus(Request $request)
+    {
         $orderid = $request->input('orderid');
         DB::table('order')
             ->where('orderid', $orderid)
             ->update([
                 'sentstatus' => "sending"
             ]);
-        return 1;
+        return [
+            'error_code' => '0'
+        ];
     }
     //
 }

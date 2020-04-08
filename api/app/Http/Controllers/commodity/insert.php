@@ -63,6 +63,8 @@ class insert extends Controller
                 'comprice' => $price
             ]
         );
-        return 1;
+        return [
+            'error_code' => '0'
+        ];
     }
 }

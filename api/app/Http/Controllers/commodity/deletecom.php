@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 class deletecom extends Controller
 {
     //
-    public function deletecom(Request $request){
+    public function deletecom(Request $request)
+    {
         // return "This is del API";
         $id = $request->input('id');
         //return $id;
@@ -18,6 +19,8 @@ class deletecom extends Controller
             ->update([
                 'status' => '0'
             ]);
-        return 'done';
+        return [
+            'error_code' => '0'
+        ];
     }
 }

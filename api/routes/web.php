@@ -22,22 +22,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/{id?}', function($id=null){
+Route::get('/', function($id=null){
     // 可选传参
-    if($id==null){
-        return 'This is the api root!';
-    }
-    else{
-        return 'This is the api root! And your id is ' . $id;
-        // php的字符串拼接用.运算符
-    }
+    abort(404);
     // 不规定id约束的话所有传入都当字符串处理了
     // 踩坑预警：下面路由没法访问的话nginx要加上try_files $uri $uri/ /index.php?$query_string; 是中间件的问题
-})->where('id','[0-9]+'); 
+});
 
 Route::prefix('commodity')->group(function(){
     Route::get('/',function(){
-        return 'This is commodityApi';
+        abort(404);
     });
     //查询所有商品
     Route::get('select/{kind?}','selectcommodity@selectall');
@@ -48,7 +42,8 @@ Route::prefix('commodity')->group(function(){
 
 Route::prefix('order')->group(function(){
     Route::get('/',function(){
-        return 'This is OrderApi';
+        // return 'This is OrderApi';
+        abort(404);
     });
     Route::get('selectorder/{id?}','order\selectorder@selectorder');
     Route::get('selectorderdetail/{id?}','order\selectorder@selectorderdetail');
@@ -57,7 +52,8 @@ Route::prefix('order')->group(function(){
 
 Route::prefix('user')->group(function(){
     Route::get('/',function(){
-        return 'This is UserApi';
+        // return 'This is UserApi';
+        abort(404);
     });
     Route::get('selectuser/{username}','selectuser@selectuser');
     Route::post('insertuser/','user\insertuser@insertuser');

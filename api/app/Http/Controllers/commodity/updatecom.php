@@ -53,7 +53,9 @@ class updatecom extends Controller
                 'comimg' => $img,
                 'comprice' => $price
             ]);
-        return 1;
+        return [
+            'error_code' => '0'
+        ];
     }
     //
 }

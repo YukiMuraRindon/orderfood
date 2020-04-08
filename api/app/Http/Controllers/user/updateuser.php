@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class updateuser extends Controller
 {
-    public function updateuser(Request $request){
+    public function updateuser(Request $request)
+    {
         $id = $request->input('userid');
         $username = $request->input('username');
         $password = $request->input('password');
@@ -24,6 +25,8 @@ class updateuser extends Controller
                 'tel' => $tel,
                 'address' => $address
             ]);
-        return 1;
+        return [
+            'error_code' => '0'
+        ];
     }
 }
