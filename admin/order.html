@@ -39,17 +39,33 @@ Description:
           <el-menu-item index="5"><a href="#">数据统计</a></el-menu-item>
         </el-menu>
       </div>
-      <div id="user" v-on:click="link">
+      <div id="user">
         <el-avatar class="block"><el-avatar :size="41" :src="circleUrl"></el-avatar></el-avatar>
       </div>
     </div>
     <!--数据加载-->
     <div id="data">
       <h3>订单数据</h3>
-      <div style="width:203px;height:44px;text-align: center; margin-left: 392px;" :center="true">
+      <div style="width:228px;height:44px;text-align: center; margin-left: 480px;" :center="true">
         <el-button type="primary" @click="dialogFormVisible = true">查询订单</el-button>
-        <!--查询商品的表单-->
-        <el-dialog title="根据订单号查询商品" :visible.sync="dialogFormVisible">
+        <el-button type="primary" @click="dialogFormVisible1 = true">订单分类</el-button>
+        <!--种类查询的表单-->
+        <el-dialog title="根据订单种类查询订单" :visible.sync="dialogFormVisible1">
+          <el-form :model="form">
+            <el-form-item label="订单种类" :label-width="formLabelWidth" v-model="info">
+              <el-select v-model="value" placeholder="请选择">
+                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible1 = false">取 消</el-button>
+            <el-button type="primary" @click="selectstatus(value)">查 询</el-button>
+          </div>
+        </el-dialog>
+        <!--订单号查询的表单-->
+        <el-dialog title="根据订单号查询订单" :visible.sync="dialogFormVisible">
           <el-form :model="form">
             <el-form-item label="订单号" :label-width="formLabelWidth">
               <el-input v-model="orderid" autocomplete="off"></el-input>
@@ -57,22 +73,34 @@ Description:
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false">查 询</el-button>
+            <el-button type="primary" @click="selectid(orderid)">查 询</el-button>
           </div>
         </el-dialog>
       </div>
       <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="orderid" label="订单编号" width="80"> </el-table-column>
-        <el-table-column prop="userid" label="用户编号" width="80"> </el-table-column>
-        <el-table-column prop="ordprice" label="订单总价" width="100"> </el-table-column>
-        <el-table-column prop="ordstatus" label="订单状态" width="80"> </el-table-column>
+        <el-table-column prop="orderid" label="订单编号" width="100"> </el-table-column>
+        <el-table-column prop="userid" label="用户编号" width="100"> </el-table-column>
+        <el-table-column prop="ordprice" label="订单总价" width="120"> </el-table-column>
+        <el-table-column prop="ordstatus" label="订单状态" width="120"> </el-table-column>
         <el-table-column prop="orddate" label="下单时间"> </el-table-column>
         <el-table-column prop="sentstatus" label="配送状态"> </el-table-column>
         <el-table-column prop="action" label="操作" id="action" :inline="true" width="234">
-          <el-button type="primary">开始派送</el-button>
-          <el-button type="primary">修改订单</el-button>
+          <template slot-scope="scope">
+            <el-button type="primary" @click="selectdetail(scope.row.orderid)">订单详情</el-button>
+            <el-button type="primary" @click="sent(scope.row)">开始派送</el-button>
+          </template>
         </el-table-column>
       </el-table>
+      <!-- Table -->
+      <el-dialog title="订单详情" :visible.sync="dialogFormVisible2" style="min-width: 300px;">
+        <el-table :data="orderdetail">
+          <el-table-column prop="orderid" label="订单id" width="100"></el-table-column>
+          <el-table-column prop="comname" label="商品名称" width="150"></el-table-column>
+          <el-table-column prop="comkind" label="商品种类"></el-table-column>
+          <el-table-column prop="comnum" label="商品数量"></el-table-column>
+          <el-table-column prop="orderdate" label="下单时间" width="160"></el-table-column>
+        </el-table>
+      </el-dialog>
     </div>
     <!--底部菜单-->
     <hr id="line" />
@@ -101,25 +129,122 @@ Description:
           circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
         };
       },
-      methods: {
-        link: function() {
-          self.location = "?2123";
-        }
-      }
+      methods: {}
     };
     var data = {
       data() {
         return {
           dialogFormVisible: false,
           dialogFormVisible1: false,
-          orderid:"all",
+          dialogFormVisible2: false,
+          orderid: "all",
           formLabelWidth: "120px",
           input: "",
           tableData: null,
-          form:null
+          orderdetail: null,
+          form: null,
+          info: null,
+          value: null,
+          options: [
+            {
+              value: "waiting",
+              label: "等待配送"
+            },
+            {
+              value: "sending",
+              label: "正在配送"
+            },
+            {
+              value: "finish",
+              label: "订单完成"
+            },
+            {
+              value: "all",
+              label: "所有订单"
+            }
+          ]
         };
       },
       methods: {
+        sent: function(row) {
+          if (row.sentstatus == "sending") {
+            this.$alert("订单已在派送中", "派送失败", {
+              confirmButtonText: "确定"
+            });
+          }
+          if (row.sentstatus == "finish") {
+            this.$alert("订单已经完成了", "派送失败", {
+              confirmButtonText: "确定"
+            });
+          }
+          if (row.sentstatus == "waiting") {
+            console.log(row.orderid);
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/order/updateorder/",
+              data: {
+                orderid: row.orderid
+              }
+            }) //执行get请求
+              .then(function(response) {
+                //this.get("all"); //插入完毕刷新页面
+                //console.log(response);
+              }) //处理数据（赋给info
+              .catch(error => {
+                console.log(error); //这里应该有错误处理
+              }); //错误处理
+            this.get("all");
+            this.$alert("派送成功", "订单开始派送", {
+              confirmButtonText: "确定"
+            });
+          }
+        },
+        selectdetail: function(orderid) {
+          this.dialogFormVisible2 = true;
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/order/selectorderdetail/" + orderid
+          }) //执行get请求
+            .then(res => (this.orderdetail = res.data)) //处理数据（赋给info
+            .catch(error => {
+              //console.log(res.data);
+              console.log(error);
+            }); //错误处理
+          //console.log(value);
+        },
+        selectid: function(id) {
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/order/selectorder/" + id
+          }) //执行get请求
+            .then(res => (this.tableData = res.data)) //处理数据（赋给info
+            .catch(error => {
+              //console.log(res.data);
+              console.log(error);
+            }); //错误处理
+          //console.log(value);
+          this.dialogFormVisible = false;
+          this.$alert("查询成功", "查询订单成功", {
+            confirmButtonText: "确定"
+          });
+          this.orderid = "all";
+        },
+        selectstatus: function(value) {
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/order/selectorder/" + value
+          }) //执行get请求
+            .then(res => (this.tableData = res.data)) //处理数据（赋给info
+            .catch(error => {
+              //console.log(res.data);
+              console.log(error);
+            }); //错误处理
+          //console.log(value);
+          // this.$alert("查询成功", "查询订单成功", {
+          //       confirmButtonText: "确定"
+          // });
+          this.dialogFormVisible1 = false;
+        },
         get: function(orderid) {
           //获取订单信息
           axios({
@@ -142,8 +267,7 @@ Description:
           .catch(error => {
             console.log(error);
           }); //错误处理
-          //console.log(this.tableData);
-
+        //console.log(this.tableData);
       }
     };
     var Ctor = Vue.extend(data);

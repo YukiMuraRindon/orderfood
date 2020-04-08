@@ -51,6 +51,8 @@ Route::prefix('order')->group(function(){
         return 'This is OrderApi';
     });
     Route::get('selectorder/{id?}','order\selectorder@selectorder');
+    Route::get('selectorderdetail/{id?}','order\selectorder@selectorderdetail');
+    Route::post('updateorder/','order\updateorder@updatestatus');
 });
 
 Route::prefix('user')->group(function(){
