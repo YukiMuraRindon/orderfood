@@ -29,6 +29,16 @@ Route::get('/', function($id=null){
     // 踩坑预警：下面路由没法访问的话nginx要加上try_files $uri $uri/ /index.php?$query_string; 是中间件的问题
 });
 
+Route::prefix('login')->group(function(){
+    Route::get('/',function(){
+         abort(404);
+        //return "This is login api";
+    });
+    Route::post('login/','login\userlogin@login');
+    Route::post('check/','login\userlogin@check');
+});
+
+
 Route::prefix('commodity')->group(function(){
     Route::get('/',function(){
         abort(404);
