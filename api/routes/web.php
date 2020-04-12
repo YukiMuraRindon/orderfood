@@ -9,6 +9,7 @@
  * --------------------------------------------------------
  * Description: 
  */
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,51 +23,52 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function($id=null){
+Route::get('/', function ($id = null) {
     // 可选传参
     abort(404);
     // 不规定id约束的话所有传入都当字符串处理了
     // 踩坑预警：下面路由没法访问的话nginx要加上try_files $uri $uri/ /index.php?$query_string; 是中间件的问题
 });
 
-Route::prefix('login')->group(function(){
-    Route::get('/',function(){
-         abort(404);
+Route::prefix('login')->group(function () {
+    Route::get('/', function () {
+        abort(404);
         //return "This is login api";
     });
-    Route::post('login/','login\userlogin@login');
-    Route::post('check/','login\userlogin@check');
+    Route::post('login/', 'login\userlogin@login');
+    Route::post('check/', 'login\userlogin@check');
+    Route::post('logout/', 'login\userlogin@logout');
 });
 
 
-Route::prefix('commodity')->group(function(){
-    Route::get('/',function(){
+Route::prefix('commodity')->group(function () {
+    Route::get('/', function () {
         abort(404);
     });
     //查询所有商品
-    Route::get('select/{kind?}','selectcommodity@selectall');
-    Route::post('insert/','commodity\insert@insertcommodity');
-    Route::post('deletecom/','commodity\deletecom@deletecom');
-    Route::post('updatecom/','commodity\updatecom@updatecom');
+    Route::get('select/{kind?}', 'selectcommodity@selectall');
+    Route::post('insert/', 'commodity\insert@insertcommodity');
+    Route::post('deletecom/', 'commodity\deletecom@deletecom');
+    Route::post('updatecom/', 'commodity\updatecom@updatecom');
 });
 
-Route::prefix('order')->group(function(){
-    Route::get('/',function(){
+Route::prefix('order')->group(function () {
+    Route::get('/', function () {
         // return 'This is OrderApi';
         abort(404);
     });
-    Route::get('selectorder/{id?}','order\selectorder@selectorder');
-    Route::get('selectorderdetail/{id?}','order\selectorder@selectorderdetail');
-    Route::post('updateorder/','order\updateorder@updatestatus');
+    Route::get('selectorder/{id?}', 'order\selectorder@selectorder');
+    Route::get('selectorderdetail/{id?}', 'order\selectorder@selectorderdetail');
+    Route::post('updateorder/', 'order\updateorder@updatestatus');
 });
 
-Route::prefix('user')->group(function(){
-    Route::get('/',function(){
+Route::prefix('user')->group(function () {
+    Route::get('/', function () {
         // return 'This is UserApi';
         abort(404);
     });
-    Route::get('selectuser/{username}','selectuser@selectuser');
-    Route::post('insertuser/','user\insertuser@insertuser');
-    Route::post('deleteuser/','user\deleteuser@deleteuser');
-    Route::post('updateuser/','user\updateuser@updateuser');
+    Route::get('selectuser/{username}', 'selectuser@selectuser');
+    Route::post('insertuser/', 'user\insertuser@insertuser');
+    Route::post('deleteuser/', 'user\deleteuser@deleteuser');
+    Route::post('updateuser/', 'user\updateuser@updateuser');
 });

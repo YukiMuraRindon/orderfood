@@ -64,27 +64,69 @@ class userlogin extends Controller
             'token' => $token
         ];
     }
-    public function check(Request $request){
+    public function check(Request $request)
+    {
         $token = $request->input('token');
-        $user = DB::table('user')
+        $user = DB::table('login')
             ->select('username', 'nickname', 'status')
             ->where([
-                ['token','=',$token]
+                ['token', '=', $token]
             ])
             ->first();
-        if($user == null){
+        if ($user == null) {
             //说明token无效
-
-        }else if($user->status == 1){
+            return [
+                'error_code' => '0',
+                'msg' => 'Wrong token',
+            ];
+        } else if ($user->status == 1) {
             //普通用户权限
-
-        }else if($user->status == 2){
+            return [
+                'error_code' => '0',
+                'status' => $user->status
+            ];
+        } else if ($user->status == 2) {
             //admin权限
-
-        }
-        else{
+            return [
+                'error_code' => '0',
+                'status' => $user->status
+            ];
+        } else {
             //其他错误情况
-
+            return [
+                'error_code' => '1',
+                'msg' => 'System error!',
+            ];
+        }
+    }
+    public function logout(Request $request)
+    {
+        $token = $request->input('token');
+        $user = DB::table('login')
+            ->select('username', 'nickname', 'status')
+            ->where([
+                ['token', '=', $token]
+            ])
+            ->first();
+        if ($user == null) {
+            //说明token无效
+            return [
+                'error_code' => '0',
+                'msg' => 'Wrong token',
+            ];
+        } else {
+            //token正确的话
+            DB::table('login')
+                ->where('token', '=', $token)
+                ->update(
+                    [
+                        'token' => ""
+                    ]
+                );
+            return [
+                'error_code' => '0',
+                'msg' => 'Logout success',
+            ];
         }
     }
 }
