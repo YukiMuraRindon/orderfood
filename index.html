@@ -27,7 +27,7 @@ Description:
   <script src="./lib/axios.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
   <script src="https://unpkg.com/vuex@3.1.3/dist/vuex.js"></script>
-
+  <script src="./js/score.js"></script>
   <body>
     <!--顶部菜单-->
     <div class="head">
@@ -216,14 +216,6 @@ Description:
     </div>
   </body>
   <script>
-    const store = new Vuex.Store({
-      state: {
-        cartData:[]
-      },
-      mutations: {
-        //这里应该有对数组的操作
-      }
-    });
     var toplist = {
       data() {
         return {
@@ -438,10 +430,13 @@ Description:
           //console.log('click 4');
         },
         addchart: function(row) {
-          console.log(row);
+          console.log(row.comid);
           //这里应该先判断是否已存在，再执行添加操作
           //如何判断存在？传入row.comid，然后用js原生操作返回布尔值。若存在则num++
           //如何添加？先给对象加入num字段，然后进入数组
+
+          //先不验证，先试着加入
+          this.$store.commit("addcom", row);
         },
         get: function(params) {
           axios({
