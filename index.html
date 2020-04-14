@@ -27,7 +27,6 @@ Description:
   <script src="./lib/axios.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
   <script src="https://unpkg.com/vuex@3.1.3/dist/vuex.js"></script>
-  <script src="./js/score.js"></script>
   <body>
     <!--顶部菜单-->
     <div class="head">
@@ -50,20 +49,11 @@ Description:
           :before-close="closedrawer"
         >
           <el-table :data="cartData">
-            <el-table-column property="comname" label="菜名"></el-table-column>
-            <el-table-column property="comkind" label="种类"></el-table-column>
-            <el-table-column property="comprice" label="单价"></el-table-column>
-            <el-table-column property="number" label="数量">
-              <el-input v-model="cartData.number">
-                <el-button slot="prepend">
-                  <i class="el-icon-minus"></i>
-                </el-button>
-                <el-button slot="append">
-                  <i class="el-icon-plus"></i>
-                </el-button>
-              </el-input>
-            </el-table-column>
-            <el-table-column property="comprice" label="小计"></el-table-column>
+            <el-table-column property="comname" label="菜名" width="100"></el-table-column>
+            <el-table-column property="comkind" label="种类" width="100"></el-table-column>
+            <el-table-column property="comprice" label="单价" width="100"></el-table-column>
+            <el-table-column property="number" label="数量"></el-table-column>
+            <el-table-column property="sumprice" label="小计"></el-table-column>
             <el-table-column label="操作">
               <el-button type="danger">
                 删除
@@ -215,13 +205,18 @@ Description:
       <p>Powered and Maintained by Rindon . All Rights Reserved.</p>
     </div>
   </body>
+
   <script>
     var toplist = {
+      beforeCreate() {
+        if (typeof localStorage.cart == "undefined") 
+          localStorage.cart = null;
+      },
       data() {
         return {
           activeIndex: "1",
           shoppingcart: false,
-          cartData: []
+          cartData: JSON.parse(localStorage.cart)
         };
       },
       methods: {
@@ -230,10 +225,12 @@ Description:
           this.shoppingcart = false;
           //console.log(this.activeIndex);
         }
-      }
+      },
+      watch: {}
     };
     var user = {
       beforeCreate() {
+        localStorage.islogin = "no";
         if (localStorage.nickname == null) {
           localStorage.nickname = "Guest";
         }
@@ -362,6 +359,7 @@ Description:
               }
             }) //执行get请求
               .then(function(response) {
+                localStorage.islogin = "yes";
                 if (response.data.status == "2") {
                   this.admin = true;
                   //console.log(this.admin);
@@ -430,13 +428,74 @@ Description:
           //console.log('click 4');
         },
         addchart: function(row) {
-          console.log(row.comid);
+          // //先判断是否登录，再加表
+          // if(localStorage.islogin == "no"){
+          //   this.$alert("尚未登录！", "请先登录再添加商品！", {
+          //     confirmButtonText: "确定"
+          //   });
+          // }
+          // else{
+          //   //如果登录后再添加商品
+          // }
+
+          //添加到localstorge
+          //步骤：1、查重，2、加数量，3、push  row.id可用
+          //console.log(this.row.comid);
+          //先检查有没有对象
+          if (localStorage.cart) {
+            let cart1 = [];
+            let cart = {
+                comid: row.comid,
+                comname: row.comname,
+                comkind: row.comkind,
+                comprice: row.comprice
+              };
+              cart.number = 1;
+              cart.sumprice = cart.comprice;
+              cart1.push(cart);
+              localStorage.setItem("cart", JSON.stringify(cart1));
+          } else {
+            console.log(localStorage.cart);
+            let k = 0;
+            let flag = 0;
+            let cart1 = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : [];
+            for (let i = 0; i < cart1.length; i++) {
+              let item = cart1[i];
+              console.log(item.comid);
+              if (item.comid === row.comid) {
+                //如果有这个对象
+                cart1[i].number++; //数量自增
+                flag = 1;
+                break;
+              } else {
+                k = k + 1;
+              }
+            }
+            //console.log("判断结束了,标志为"+flag);
+            if (flag == 0) {
+              //如果无重复则生成对象
+              //console.log("开始生成了");
+              let cart = {
+                comid: row.comid,
+                comname: row.comname,
+                comkind: row.comkind,
+                comprice: row.comprice
+              };
+              cart.number = 1;
+              cart.sumprice = cart.comprice;
+              cart1.push(cart);
+              localStorage.setItem("cart", JSON.stringify(cart1));
+            }
+          }
+
+          //console.log(localStorage.cart);
+
           //这里应该先判断是否已存在，再执行添加操作
           //如何判断存在？传入row.comid，然后用js原生操作返回布尔值。若存在则num++
           //如何添加？先给对象加入num字段，然后进入数组
 
           //先不验证，先试着加入
-          this.$store.commit("addcom", row);
+          //先加购物车表试试吧
         },
         get: function(params) {
           axios({
