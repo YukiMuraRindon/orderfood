@@ -78,3 +78,6 @@ html {
   text-align: center;
   font-size: 12px;
 }
+.v-modal{
+  display: none;
+}

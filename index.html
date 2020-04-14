@@ -38,7 +38,7 @@ Description:
         <el-menu :default-active="activeIndex" class="el-menu" mode="horizontal" active-text-color="#ffffffs">
           <el-menu-item index="1">菜品展示</el-menu-item>
           <el-menu-item index="2" @click="shoppingcart = true">我的购物车</el-menu-item>
-          <el-menu-item index="3">订单管理</el-menu-item>
+          <el-menu-item index="3" @click="orderlist">订单管理</el-menu-item>
         </el-menu>
 
         <el-drawer
@@ -47,7 +47,7 @@ Description:
           direction="rtl"
           size="65%"
           :before-close="closedrawer"
-          @opened="open()"
+          @open="open()"
           ref="drawer" 
         >
           <el-table :data="cartData">
@@ -229,11 +229,21 @@ Description:
         },
         open(){
           this.cartData = JSON.parse(localStorage.cart);
+        },
+        orderlist:function(){
+          if(localStorage.islogin == "no"){
+            this.$alert("请先登录！", {
+              confirmButtonText: "确定"
+            });
+          }else{
+            //这里应该打开抽屉
+          //然后axios查后台展示在表格
+          }
         }
       },
       watch: {},
       mounted() {
-        this.$refs.drawer.opened(); //方法      
+        this.$refs.drawer.open(); //方法      
       },
     };
     var user = {
@@ -473,7 +483,10 @@ Description:
               //console.log(item.comid);
               if (item.comid === row.comid) {
                 //如果有这个对象
+                //console.log(cart1[i].number);
                 cart1[i].number++; //数量自增
+                //console.log(cart1[1].number);
+                //console.log(typeof(cart1[i].number));
                 flag = 1;
                 break;
               } else {
@@ -493,8 +506,8 @@ Description:
               cart.number = 1;
               cart.sumprice = cart.comprice;
               cart1.push(cart);
-              localStorage.setItem("cart", JSON.stringify(cart1));
             }
+            localStorage.setItem("cart", JSON.stringify(cart1));
           }
 
           //console.log(localStorage.cart);
