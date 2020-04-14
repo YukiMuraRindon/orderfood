@@ -47,6 +47,8 @@ Description:
           direction="rtl"
           size="65%"
           :before-close="closedrawer"
+          @opened="open()"
+          ref="drawer" 
         >
           <el-table :data="cartData">
             <el-table-column property="comname" label="菜名" width="100"></el-table-column>
@@ -224,9 +226,15 @@ Description:
           this.activeIndex = "1";
           this.shoppingcart = false;
           //console.log(this.activeIndex);
+        },
+        open(){
+          this.cartData = JSON.parse(localStorage.cart);
         }
       },
-      watch: {}
+      watch: {},
+      mounted() {
+        this.$refs.drawer.opened(); //方法      
+      },
     };
     var user = {
       beforeCreate() {
@@ -442,7 +450,7 @@ Description:
           //步骤：1、查重，2、加数量，3、push  row.id可用
           //console.log(this.row.comid);
           //先检查有没有对象
-          if (localStorage.cart) {
+          if (localStorage.cart == "null") {
             let cart1 = [];
             let cart = {
                 comid: row.comid,
@@ -454,14 +462,15 @@ Description:
               cart.sumprice = cart.comprice;
               cart1.push(cart);
               localStorage.setItem("cart", JSON.stringify(cart1));
+              //console.log("null!");
           } else {
-            console.log(localStorage.cart);
+            //onsole.log(localStorage.cart);
             let k = 0;
             let flag = 0;
             let cart1 = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : [];
             for (let i = 0; i < cart1.length; i++) {
               let item = cart1[i];
-              console.log(item.comid);
+              //console.log(item.comid);
               if (item.comid === row.comid) {
                 //如果有这个对象
                 cart1[i].number++; //数量自增
