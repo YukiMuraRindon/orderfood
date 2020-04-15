@@ -38,6 +38,7 @@ Route::prefix('login')->group(function () {
     Route::post('login/', 'login\userlogin@login');
     Route::post('check/', 'login\userlogin@check');
     Route::post('logout/', 'login\userlogin@logout');
+    Route::post('regist/', 'login\registuser@regist');
 });
 
 

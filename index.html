@@ -40,7 +40,7 @@ Description:
           <el-menu-item index="2" @click="shoppingcart = true">我的购物车</el-menu-item>
           <el-menu-item index="3" @click="orderlist">订单管理</el-menu-item>
         </el-menu>
-
+        <!--购物车抽屉-->
         <el-drawer
           title="已加入购物车的商品总览："
           :visible.sync="shoppingcart"
@@ -48,7 +48,7 @@ Description:
           size="65%"
           :before-close="closedrawer"
           @open="open()"
-          ref="drawer" 
+          ref="drawer"
         >
           <el-table :data="cartData">
             <el-table-column property="comname" label="菜名" width="100"></el-table-column>
@@ -57,13 +57,15 @@ Description:
             <el-table-column property="number" label="数量"></el-table-column>
             <el-table-column property="sumprice" label="小计"></el-table-column>
             <el-table-column label="操作">
-              <el-button type="danger">
-                删除
-                <i class="el-icon-delete2 el-icon--right"></i>
-              </el-button>
+              <template slot-scope="scope">
+                <el-button type="danger" @click="del(scope.row.comid)">
+                  删除
+                  <i class="el-icon-delete2 el-icon--right"></i>
+                </el-button>
+              </template>
             </el-table-column>
           </el-table>
-          <el-button type="primary" style="float: right;margin-right: 19px;margin-top: 25px;">
+          <el-button type="primary" style="float: right;margin-right: 19px;margin-top: 25px;" @click="order(cartData)">
             下单
           </el-button>
         </el-drawer>
@@ -88,7 +90,7 @@ Description:
               <el-input v-model="LoginForm.username" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="密码" :label-width="formLabelWidth">
-              <el-input v-model="LoginForm.password" autocomplete="off"></el-input>
+              <el-input v-model="LoginForm.password" autocomplete="off" show-password></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -103,10 +105,10 @@ Description:
               <el-input v-model="RegistForm.username" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="密码" :label-width="formLabelWidth">
-              <el-input v-model="RegistForm.password" autocomplete="off"></el-input>
+              <el-input v-model="RegistForm.password" autocomplete="off" show-password></el-input>
             </el-form-item>
             <el-form-item label="确认密码" :label-width="formLabelWidth">
-              <el-input v-model="RegistForm.repassword" autocomplete="off"></el-input>
+              <el-input v-model="RegistForm.repassword" autocomplete="off" show-password></el-input>
             </el-form-item>
             <el-form-item label="昵称" :label-width="formLabelWidth">
               <el-input v-model="RegistForm.nickname" autocomplete="off"></el-input>
@@ -211,8 +213,7 @@ Description:
   <script>
     var toplist = {
       beforeCreate() {
-        if (typeof localStorage.cart == "undefined") 
-          localStorage.cart = null;
+        if (typeof localStorage.cart == "undefined") localStorage.cart = null;
       },
       data() {
         return {
@@ -227,24 +228,62 @@ Description:
           this.shoppingcart = false;
           //console.log(this.activeIndex);
         },
-        open(){
+        open() {
           this.cartData = JSON.parse(localStorage.cart);
         },
-        orderlist:function(){
-          if(localStorage.islogin == "no"){
+        orderlist: function() {
+          if (localStorage.islogin == "no") {
             this.$alert("请先登录！", {
               confirmButtonText: "确定"
             });
-          }else{
+          } else {
             //这里应该打开抽屉
-          //然后axios查后台展示在表格
+            //然后axios查后台展示在表格
+          }
+        },
+        del(comid) {
+          //能获取到id
+          //console.log(comid);
+          let k = 0;
+          let cart1 = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : [];
+          for (let i = 0; i < cart1.length; i++) {
+            let item = cart1[i];
+            //console.log(item.comid);
+            if (item.comid === comid) {
+              //如果有这个对象
+              //console.log(typeof(cart1[i]));
+              //console.log(cart1);
+              cart1.splice(i, 1);
+              //console.log(cart1);
+              //cart1[i].number++; //数量自增
+              //console.log(cart1[1].number);
+              //console.log(typeof(cart1[i].number));
+              break;
+            } else {
+              k = k + 1;
+            }
+          }
+          localStorage.setItem("cart", JSON.stringify(cart1));
+          this.$alert("删除成功！", {
+            confirmButtonText: "确定"
+          });
+          this.cartData = JSON.parse(localStorage.cart);
+        },
+        order: function(cartData) {
+          //console.log(cartData);
+          if (localStorage.islogin == "no") {
+            this.$alert("请先登录！", {
+              confirmButtonText: "确定"
+            });
+          } else {
+            //如何下单？循环发送axios？
           }
         }
       },
       watch: {},
       mounted() {
-        this.$refs.drawer.open(); //方法      
-      },
+        this.$refs.drawer.open(); //方法
+      }
     };
     var user = {
       beforeCreate() {
@@ -357,8 +396,54 @@ Description:
             }); //错误处理
         },
         clickregist: function() {
-          this.pop = false;
-          this.registForm = false;
+          //点击了注册之后
+          //先检查：密码和确认密码，电话号码全为数字
+          if (this.RegistForm.password != this.RegistForm.repassword) {
+            this.$alert("两次密码输入不一致！", "请检查输入内容！", {
+              confirmButtonText: "确定"
+            });
+          } else if (isNaN(this.RegistForm.telephone)) {
+            this.$alert("电话号码只能为数字！", "请检查输入内容！", {
+              confirmButtonText: "确定"
+            });
+          } else {
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/login/regist",
+              data: {
+                username: this.RegistForm.username,
+                password: this.RegistForm.password,
+                nickname: this.RegistForm.nickname,
+                address: this.RegistForm.address,
+                telephone: this.RegistForm.telephone
+              }
+            }) //执行get请求
+              .then(function(response) {
+                //执行完了应该标记登录状态
+                console.log(response);
+                localStorage.islogin = "yes";
+                localStorage.nickname = response.data.nickname;
+                localStorage.token = response.data.token;
+              })
+              .catch(error => {
+                this.$alert("注册失败，请联系管理员", "注册失败！", {
+                  confirmButtonText: "确定"
+                });
+                console.log(error);
+              }); //错误处理
+            this.$alert("注册成功，欢迎您" + localStorage.nickname, "注册成功！", {
+              confirmButtonText: "确定"
+            });
+            this.pop = false;
+            this.registForm = false;
+            //初始化
+            this.RegistForm.username = "";
+            this.RegistForm.password = "";
+            this.RegistForm.nickname = "";
+            this.RegistForm.address = "";
+            this.RegistForm.telephone = "";
+            this.RegistForm.repassword = "";
+          }
         },
         clickcancal: function() {
           this.pop = false;
@@ -463,16 +548,16 @@ Description:
           if (localStorage.cart == "null") {
             let cart1 = [];
             let cart = {
-                comid: row.comid,
-                comname: row.comname,
-                comkind: row.comkind,
-                comprice: row.comprice
-              };
-              cart.number = 1;
-              cart.sumprice = cart.comprice;
-              cart1.push(cart);
-              localStorage.setItem("cart", JSON.stringify(cart1));
-              //console.log("null!");
+              comid: row.comid,
+              comname: row.comname,
+              comkind: row.comkind,
+              comprice: row.comprice
+            };
+            cart.number = 1;
+            cart.sumprice = cart.comprice;
+            cart1.push(cart);
+            localStorage.setItem("cart", JSON.stringify(cart1));
+            //console.log("null!");
           } else {
             //onsole.log(localStorage.cart);
             let k = 0;
@@ -508,6 +593,9 @@ Description:
               cart1.push(cart);
             }
             localStorage.setItem("cart", JSON.stringify(cart1));
+            this.$alert("添加成功！", {
+              confirmButtonText: "确定"
+            });
           }
 
           //console.log(localStorage.cart);
