@@ -79,29 +79,27 @@ Description:
           ref="drawer"
           :modal="false"
         >
-          <el-table :data="orderData">
-            <el-table-column property="orderid" label="订单编号" width="100"></el-table-column>
+          <el-table :data="orderData" style="min-width:800px;">
+            <el-table-column property="orderid" label="订单编号" width="50"></el-table-column>
             <el-table-column property="ordprice" label="订单价格" width="100"></el-table-column>
             <el-table-column property="ordstatus" label="订单状态" width="100"></el-table-column>
-            <el-table-column property="sentstatus" label="配送状态"></el-table-column>
+            <el-table-column property="sentstatus" label="配送状态" width="80"></el-table-column>
             <el-table-column property="orddate" label="下单时间"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button type="primary" @click="orderdetail(scope.row.orderid)">
                   订单详情
-                  <i class="el-icon-delete2 el-icon--right"></i>
+                </el-button>
+                <el-button type="primary" @click="orderfinish(scope.row)">
+                  确认收货
                 </el-button>
               </template>
             </el-table-column>
           </el-table>
-          <el-button type="primary" style="float: right;margin-right: 19px;margin-top: 25px;" @click="">
-            确认收货
-          </el-button>
         </el-drawer>
         <!-- Table -->
         <el-dialog title="订单详情" :visible.sync="orderVisible" style="min-width: 300px;" style="z-index:2006">
           <el-table :data="orderdetaildata">
-            <el-table-column prop="orderid" label="订单id" width="100"></el-table-column>
             <el-table-column prop="comname" label="商品名称" width="150"></el-table-column>
             <el-table-column prop="comkind" label="商品种类"></el-table-column>
             <el-table-column prop="comnum" label="商品数量"></el-table-column>
@@ -343,6 +341,33 @@ Description:
               //console.log(res.data);
               console.log(error);
             }); //错误处理
+        },
+        orderfinish: function(row) {
+          if (row.sentstatus == "finish") {
+            this.$alert("订单已完成！", {
+              confirmButtonText: "确定"
+            });
+          } else if (row.sentstatus == "sending") {
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/order/finishorder/",
+              data: {
+                orderid: row.orderid
+              }
+            }) //执行get请求
+              .then(res => row.sentstatus = "finish") //处理数据（赋给info
+              .catch(error => {
+                //console.log(res.data);
+                console.log(error);
+              }); //错误处理
+              this.$alert("订单收货成功！", {
+              confirmButtonText: "确定"
+            });
+          }else if(row.sentstatus == "waiting"){
+            this.$alert("尚未发货，请稍等！", {
+              confirmButtonText: "确定"
+            });
+          }
         }
       },
       watch: {},

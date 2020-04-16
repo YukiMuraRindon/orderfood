@@ -20,5 +20,16 @@ class updateorder extends Controller
             'error_code' => '0'
         ];
     }
+    public function finishorder(Request $request){
+        $orderid = $request->input('orderid');
+        DB::table('order')
+            ->where('orderid', $orderid)
+            ->update([
+                'sentstatus' => "finish"
+            ]);
+        return [
+            'error_code' => '0'
+        ];
+    }
     //
 }
