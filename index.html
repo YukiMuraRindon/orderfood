@@ -69,6 +69,45 @@ Description:
             下单
           </el-button>
         </el-drawer>
+        <!--订单总览-->
+        <!--遮罩是订单管理的问题-->
+        <el-drawer
+          title="订单总览："
+          :visible.sync="orderdrawer"
+          direction="rtl"
+          size="65%"
+          ref="drawer"
+          :modal="false"
+        >
+          <el-table :data="orderData">
+            <el-table-column property="orderid" label="订单编号" width="100"></el-table-column>
+            <el-table-column property="ordprice" label="订单价格" width="100"></el-table-column>
+            <el-table-column property="ordstatus" label="订单状态" width="100"></el-table-column>
+            <el-table-column property="sentstatus" label="配送状态"></el-table-column>
+            <el-table-column property="orddate" label="下单时间"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button type="primary" @click="orderdetail(scope.row.orderid)">
+                  订单详情
+                  <i class="el-icon-delete2 el-icon--right"></i>
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-button type="primary" style="float: right;margin-right: 19px;margin-top: 25px;" @click="">
+            确认收货
+          </el-button>
+        </el-drawer>
+        <!-- Table -->
+        <el-dialog title="订单详情" :visible.sync="orderVisible" style="min-width: 300px;" style="z-index:2006">
+          <el-table :data="orderdetaildata">
+            <el-table-column prop="orderid" label="订单id" width="100"></el-table-column>
+            <el-table-column prop="comname" label="商品名称" width="150"></el-table-column>
+            <el-table-column prop="comkind" label="商品种类"></el-table-column>
+            <el-table-column prop="comnum" label="商品数量"></el-table-column>
+            <el-table-column prop="orderdate" label="下单时间" width="160"></el-table-column>
+          </el-table>
+        </el-dialog>
       </div>
 
       <div id="user" style="margin-right:40px;">
@@ -219,7 +258,11 @@ Description:
         return {
           activeIndex: "1",
           shoppingcart: false,
-          cartData: JSON.parse(localStorage.cart)
+          cartData: JSON.parse(localStorage.cart),
+          orderdrawer: false,
+          orderData: [],
+          orderVisible: false,
+          orderdetaildata: []
         };
       },
       methods: {
@@ -238,6 +281,16 @@ Description:
             });
           } else {
             //这里应该打开抽屉
+            axios({
+              method: "get",
+              url: "http://192.168.2.201/order/selectuserorder/" + localStorage.nickname
+            }) //执行get请求
+              .then(res => (this.orderData = res.data)) //处理数据（赋给info
+              .catch(error => {
+                //console.log(res.data);
+                console.log(error);
+              }); //错误处理
+            this.orderdrawer = true;
             //然后axios查后台展示在表格
           }
         },
@@ -278,6 +331,18 @@ Description:
           } else {
             //如何下单？循环发送axios？
           }
+        },
+        orderdetail: function(orderid) {
+          this.orderVisible = true;
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/order/selectorderdetail/" + orderid
+          }) //执行get请求
+            .then(res => (this.orderdetaildata = res.data)) //处理数据（赋给info
+            .catch(error => {
+              //console.log(res.data);
+              console.log(error);
+            }); //错误处理
         }
       },
       watch: {},
@@ -287,7 +352,9 @@ Description:
     };
     var user = {
       beforeCreate() {
-        localStorage.islogin = "no";
+        if (localStorage.islogin == null) {
+          localStorage.islogin = "no";
+        }
         if (localStorage.nickname == null) {
           localStorage.nickname = "Guest";
         }
@@ -371,6 +438,7 @@ Description:
                 this.$alert(response.message, "登录成功！", {
                   confirmButtonText: "确定"
                 });
+                localStorage.islogin = "yes";
                 localStorage.nickname = this.nick;
                 localStorage.token = this.token;
                 this.pop = false;
@@ -382,6 +450,7 @@ Description:
                 this.$alert(response.message, "登录成功！", {
                   confirmButtonText: "确定"
                 });
+                localStorage.islogin = "yes";
                 localStorage.nickname = this.nick;
                 localStorage.token = this.token;
                 this.pop = false;
@@ -431,18 +500,12 @@ Description:
                 });
                 console.log(error);
               }); //错误处理
-            this.$alert("注册成功，欢迎您" + localStorage.nickname, "注册成功！", {
+            location.reload();
+            this.$alert("注册成功，欢迎您", "注册成功！", {
               confirmButtonText: "确定"
             });
             this.pop = false;
             this.registForm = false;
-            //初始化
-            this.RegistForm.username = "";
-            this.RegistForm.password = "";
-            this.RegistForm.nickname = "";
-            this.RegistForm.address = "";
-            this.RegistForm.telephone = "";
-            this.RegistForm.repassword = "";
           }
         },
         clickcancal: function() {
@@ -493,7 +556,6 @@ Description:
                 location.reload();
               })
               .catch(error => {
-                this.admin = false;
                 console.log(error);
               }); //错误处理
           }

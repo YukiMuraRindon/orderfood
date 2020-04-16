@@ -59,6 +59,7 @@ Route::prefix('order')->group(function () {
         abort(404);
     });
     Route::get('selectorder/{id?}', 'order\selectorder@selectorder');
+    Route::get('selectuserorder/{nickname?}', 'order\selectorder@selectuserorder');
     Route::get('selectorderdetail/{id?}', 'order\selectorder@selectorderdetail');
     Route::post('updateorder/', 'order\updateorder@updatestatus');
 });

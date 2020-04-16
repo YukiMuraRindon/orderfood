@@ -36,4 +36,18 @@ class selectorder extends Controller
         $orderdetail = DB::table('orderdetail')->where("orderid",$id)->get();
         return response()->json($orderdetail);
     }
+    public function selectuserorder($nickname){
+        $user = DB::table('user')->where("nickname",$nickname)->first();
+        //echo $user->userid;
+        $order = DB::table('order')->where("userid",$user->userid)->get();
+        echo $order;
+        //  return [
+        //      'error_code' => '0',
+        //      'orderid' => $order->orderid,
+        //      'ordprice' => $order->ordprice,
+        //      'ordstatus' => $order->ordstatus,
+        //      'sentstatus' => $order->sentstatus,
+        //      'orddate' => $order->orddate
+        //  ];
+    }
 }
