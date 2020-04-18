@@ -112,7 +112,8 @@ Description:
       <div id="user" style="margin-right:40px;">
         <p style="margin-right:40px; text-align: center; display: inline;">
           欢迎您：{{ nick }}
-          <el-button type="text" @click="logout">注销</el-button>
+          <el-button type="text" v-if="islogin == true" @click="logout">注销</el-button>
+          <el-button type="text" v-if="admin == true " @click="toAdmin()">进入后台</el-button>
         </p>
         <img src="./img/userlogo.png" alt="userlogo" style="width:50px;height:50px;" @click="popbutton" />
         <el-popover placement="top" width="160" v-model="pop">
@@ -447,9 +448,14 @@ Description:
       beforeCreate() {
         if (localStorage.islogin == null) {
           localStorage.islogin = "no";
-        }
+        }else if(localStorage.islogin == "yes")
+          this.islogin = true;
         if (localStorage.nickname == null) {
           localStorage.nickname = "Guest";
+        }else if(localStorage.nickname === "rindon"){
+          this.admin = true;
+          //console.log(this.admin);
+          //建议改成后端请求验证
         }
       },
       created() {
@@ -470,7 +476,7 @@ Description:
               }
             })
             .catch(error => {
-              this.admin = false;
+              //this.admin = false;
               console.log(error);
             }); //错误处理
         }
@@ -495,15 +501,18 @@ Description:
           },
           info: null,
           token: null,
-          admin: false,
           formLabelWidth: "120px",
           circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
         };
       },
       methods: {
+        toAdmin:function(){
+          window.location.href='./admin/index.html';
+        },
         popbutton: function() {
           if (localStorage.nickname == null || this.nick == "Guest") this.pop = true;
-          else;
+          else ;
+            //console.log(this.admin);
         },
         clicklogin: function() {
           axios({
@@ -540,6 +549,7 @@ Description:
               } else if (this.info.data.status == 2) {
                 //如果是管理员
                 //console.log("欢迎管理员"+this.info.data[0].nickname);
+                this.admin = true;
                 this.nick = this.info.data.nickname;
                 this.$alert(response.message, "登录成功！", {
                   confirmButtonText: "确定"
@@ -626,7 +636,6 @@ Description:
                 }
               })
               .catch(error => {
-                this.admin = false;
                 console.log(error);
               }); //错误处理
           }
@@ -714,6 +723,9 @@ Description:
             cart.sumprice = cart.comprice;
             cart1.push(cart);
             localStorage.setItem("cart", JSON.stringify(cart1));
+            this.$alert("添加成功！", {
+              confirmButtonText: "确定"
+            });
             //console.log("null!");
           } else {
             //onsole.log(localStorage.cart);

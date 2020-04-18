@@ -193,10 +193,10 @@ Description:
               .catch(error => {
                 console.log(error); //这里应该有错误处理
               }); //错误处理
-            this.get("all");
             this.$alert("派送成功", "订单开始派送", {
               confirmButtonText: "确定"
             });
+            this.get("all");
           }
         },
         selectdetail: function(orderid) {
