@@ -68,6 +68,7 @@ Description:
           <el-button type="primary" style="float: right;margin-right: 19px;margin-top: 25px;" @click="order(cartData)">
             下单
           </el-button>
+          <span style="float: right;margin-right: 19px;margin-top: 35px;">总价格：{{ allprice }}元</span>
         </el-drawer>
         <!--订单总览-->
         <!--遮罩是订单管理的问题-->
@@ -260,7 +261,8 @@ Description:
           orderdrawer: false,
           orderData: [],
           orderVisible: false,
-          orderdetaildata: []
+          orderdetaildata: [],
+          allprice: 0.0
         };
       },
       methods: {
@@ -271,6 +273,12 @@ Description:
         },
         open() {
           this.cartData = JSON.parse(localStorage.cart);
+          this.allprice = 0;
+          if (this.cartData) {
+            for (i = 0; i < this.cartData.length; i++) {
+              this.allprice += parseFloat(this.cartData[i].comprice) * parseInt(this.cartData[i].number);
+            }
+          }
         },
         orderlist: function() {
           if (localStorage.islogin == "no") {
@@ -319,6 +327,10 @@ Description:
             confirmButtonText: "确定"
           });
           this.cartData = JSON.parse(localStorage.cart);
+          this.allprice = 0;
+          for (i = 0; i < this.cartData.length; i++) {
+            this.allprice += parseFloat(this.cartData[i].comprice) * parseInt(this.cartData[i].number);
+          }
         },
         order: function(cartData) {
           //console.log(cartData);
@@ -326,8 +338,64 @@ Description:
             this.$alert("请先登录！", {
               confirmButtonText: "确定"
             });
+          } else if (this.cartData == null) {
+            this.$alert("请先加购！", {
+              confirmButtonText: "确定"
+            });
           } else {
             //如何下单？循环发送axios？
+
+            //console.log(length);
+            const that = this;
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/order/setorder",
+              data: {
+                nickname: localStorage.nickname,
+                ordprice: this.allprice,
+                ordstatus: "payed",
+                sentstatus: "waiting"
+              }
+            }) //执行get请求
+              .then(function(response) {
+                //返回orderid,发送detail
+                //暂略axios
+                //console.log(response.data.orderid);
+                //console.log(this.cartData.length);
+                let cartData1 = that.cartData;
+                console.log(cartData1[0].comid);
+                for (i = 0; i < Object.keys(cartData1).length; i++) {
+                  axios({
+                    method: "post",
+                    url: "http://192.168.2.201/order/setorderdetail",
+                    data: {
+                      orderid: response.data.orderid,
+                      comid: cartData1[i].comid,
+                      comname: cartData1[i].comname,
+                      comkind: cartData1[i].comkind,
+                      comnum: cartData1[i].number
+                    }
+                  }) //执行get请求
+                    .then(function(response) {
+                      if (response.data.error_code == 0) {
+                        console.log(response.data);
+                      }
+                    }) //处理数据（赋给info
+                    .catch(error => {
+                      console.log(error);
+                    }); //错误处理
+                }
+                that.$alert("下单成功！", {
+                  confirmButtonText: "确定"
+                });
+                that.cartData = null;
+                localStorage.cart = null;
+                that.allprice = 0;
+                that.orderdrawer = false;
+              })
+              .catch(error => {
+                console.log(error);
+              }); //错误处理
           }
         },
         orderdetail: function(orderid) {
@@ -355,15 +423,15 @@ Description:
                 orderid: row.orderid
               }
             }) //执行get请求
-              .then(res => row.sentstatus = "finish") //处理数据（赋给info
+              .then(res => (row.sentstatus = "finish")) //处理数据（赋给info
               .catch(error => {
                 //console.log(res.data);
                 console.log(error);
               }); //错误处理
-              this.$alert("订单收货成功！", {
+            this.$alert("订单收货成功！", {
               confirmButtonText: "确定"
             });
-          }else if(row.sentstatus == "waiting"){
+          } else if (row.sentstatus == "waiting") {
             this.$alert("尚未发货，请稍等！", {
               confirmButtonText: "确定"
             });
@@ -452,10 +520,11 @@ Description:
               // console.log(this.info);
               //console.log(this.info.data);
               //console.log(this.info.data.token);
-              if (this.info.data == null) {
-                this.$alert(response.message, "登录信息有误！", {
+              if (this.info.data.error_code == "1") {
+                this.$alert(response.message, this.info.data.message, {
                   confirmButtonText: "确定"
                 });
+                this.LoginForm.password = "";
               } else if (this.info.data.status == 1) {
                 //如果登录成功且是普通用户
                 //console.log("欢迎用户"+this.info.data[0].username);
@@ -578,6 +647,7 @@ Description:
               .then(function(response) {
                 localStorage.removeItem("nickname");
                 localStorage.removeItem("token");
+                localStorage.islogin = "no";
                 location.reload();
               })
               .catch(error => {
