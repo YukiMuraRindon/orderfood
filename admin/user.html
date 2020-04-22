@@ -16,26 +16,25 @@ Description:
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="YukiMuraRindon" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1" />
-    <link rel="Website icon" href="../img/favicon.ico" type="image/x-icon" />
+    <link rel="Website icon" href="img/favicon.ico" type="image/x-icon" />
     <title>后台管理界面</title>
   </head>
   <!--引入组件，缺少axios-->
-  <script src="../lib/vue.js"></script>
-  <script src="../lib/element.js"></script>
+  <script src="lib/vue.js"></script>
+  <script src="lib/element.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
-  <link href="./css/style.css" type="text/css" rel="stylesheet" />
-  <script src="../lib/axios.js"></script>
-
+  <link href="css/style.css" type="text/css" rel="stylesheet" />
+  <script src="lib/axios.js"></script>
   <body>
     <!--顶部菜单-->
     <div class="head">
-      <a href="../index.html"><img src="../img/logo.jpg" id="img"/></a>
+      <a href="index.html"><img src="img/logo.jpg" id="img"/></a>
       <div id="toplist">
         <el-menu :default-active="activeIndex" class="el-menu" mode="horizontal" @select="handleSelect">
-          <el-menu-item index="1"><a href="index.html">商品管理</a></el-menu-item>
-          <el-menu-item index="2"><a href="order.html">订单管理</a></el-menu-item>
-          <el-menu-item index="3"><a href="user.html">用户管理</a></el-menu-item>
-          <el-menu-item index="4"><a href="trend.html">订单趋势</a></el-menu-item>
+          <el-menu-item index="1"><a href="./index.html">商品管理</a></el-menu-item>
+          <el-menu-item index="2"><a href="./order.html">订单管理</a></el-menu-item>
+          <el-menu-item index="3"><a href="./user.html">用户管理</a></el-menu-item>
+          <el-menu-item index="4"><a href="./trend.html">订单趋势</a></el-menu-item>
           <el-menu-item index="5"><a href="#">数据统计</a></el-menu-item>
         </el-menu>
       </div>

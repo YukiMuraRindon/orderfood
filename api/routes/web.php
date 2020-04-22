@@ -77,3 +77,8 @@ Route::prefix('user')->group(function () {
     Route::post('deleteuser/', 'user\deleteuser@deleteuser');
     Route::post('updateuser/', 'user\updateuser@updateuser');
 });
+
+Route::prefix('statistics')->group(function () {
+    Route::get('orderstat/','statistics\orderstat@statorder');
+    Route::get('userord/','statistics\orderstat@statuserord');
+});

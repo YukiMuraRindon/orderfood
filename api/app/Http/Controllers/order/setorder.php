@@ -77,7 +77,9 @@ class setorder extends Controller
                 ]
             );
 
-            DB::table('commodity')->update(
+            DB::table('commodity')
+            ->where('comid',$comid)
+            ->update(
                 [
                     'comstock' => $stock->comstock - $comnum
                 ]
