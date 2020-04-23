@@ -46,24 +46,35 @@ Description:
           <el-menu-item index="2"><a href="./order.html">订单管理</a></el-menu-item>
           <el-menu-item index="3"><a href="./user.html">用户管理</a></el-menu-item>
           <el-menu-item index="4"><a href="./trend.html">订单趋势</a></el-menu-item>
-          <el-menu-item index="5"><a href="#">数据统计</a></el-menu-item>
         </el-menu>
       </div>
-      <div id="user" v-on:click="link">
-        <el-avatar class="block"><el-avatar :size="41" :src="circleUrl"></el-avatar></el-avatar>
+      <div id="user">
+          <p style="margin-right:40px; text-align: center; float: right;">
+              欢迎您：{{ nick }}
+              <el-button type="text" @click="logout">注销</el-button>
+          </p>
+          <img src="./img/userlogo.png" alt="userlogo" style="width:50px;height:50px;" />
       </div>
     </div>
+    <br />
     <!--图表开始-->
     <div id="chart">
-      <!--表1饼图-->
-      <div id="chart1" style="height: 265px;width:300px;float:left;">
-        <div id="orderChart1" style="height: 100%;margin-top: 0px;"></div>
+      <div id="chart3" style="height: 300px;width:1000px;float:left;">
+        <div id="orderChart3" style="height: 100%;margin-top: 0px;"></div>
       </div>
-      <!--表2柱图-->
-      <div id="chart2" style="height: 265px;width:300px;float:left;">
-        <div id="orderChart2" style="height: 100%;margin-top: 0px;"></div>
+      <br />
+      <div>
+        <!--表1饼图-->
+        <div id="chart1" style="height: 400px;width:500px;float:left;">
+          <div id="orderChart1" style="height: 100%;margin-top: 0px;"></div>
+        </div>
+        <!--表2柱图-->
+        <div id="chart2" style="height: 400px;width:500px;float:left;">
+          <div id="orderChart2" style="height: 100%;margin-top: 0px;"></div>
+        </div>
       </div>
     </div>
+    <br />
     <!--底部菜单-->
     <hr id="line" />
     <div id="footer">
@@ -74,6 +85,35 @@ Description:
 
   <script>
     var toplist = {
+      beforeCreate() {
+        //实例化之前先验证是否是管理员
+        if (localStorage.token == null) {
+          this.admin = false;
+          alert('请先登录！！！')
+          location.href='../index.html'
+        } else {
+          axios({
+            method: "post",
+            url: "http://192.168.2.201/login/check",
+            data: {
+              token: localStorage.token
+            }
+          }) //执行get请求
+            .then(function(response) {
+              localStorage.islogin = "yes";
+              if (response.data.status == "2") {
+                this.admin = true;
+                //console.log(this.admin);
+              }else {
+                alert('请用管理员账号登录！！！')
+                location.href='../index.html'
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            }); //错误处理
+        }
+      },
       data() {
         return {
           activeIndex: "4",
@@ -86,7 +126,53 @@ Description:
         }
       }
     };
-
+    var user = {
+      beforeCreate() {
+        if (localStorage.islogin == null) {
+          localStorage.islogin = "no";
+        }else if(localStorage.islogin == "yes")
+          this.islogin = true;
+        if (localStorage.nickname == null) {
+          localStorage.nickname = "Guest";
+        }else if(localStorage.nickname === "rindon"){
+          this.admin = true;
+          //console.log(this.admin);
+          //建议改成后端请求验证
+        }
+      },
+      data() {
+        return {
+          circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+          nick: localStorage.nickname,
+        };
+      },
+      methods: {
+        logout: function() {
+          if (localStorage.token == null) {
+            localStorage.removeItem("nickname");
+            localStorage.removeItem("token");
+            location.reload();
+          } else {
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/login/logout",
+              data: {
+                token: localStorage.token
+              }
+            }) //执行get请求
+              .then(function(response) {
+                localStorage.removeItem("nickname");
+                localStorage.removeItem("token");
+                localStorage.islogin = "no";
+                location.reload();
+              })
+              .catch(error => {
+                console.log(error);
+              }); //错误处理
+          }
+        }
+      }
+    };
     var orderChart = {
       beforeCreate() {
         axios({
@@ -94,9 +180,41 @@ Description:
           url: "http://192.168.2.201/statistics/orderstat/"
         }) //执行get请求
           .then(function(response) {
+            if (localStorage.lu === undefined) {
+              localStorage.flag = 1;
+            }
             localStorage.lu = response.data.lu;
             localStorage.chuan = response.data.chuan;
             localStorage.yue = response.data.yue;
+            //执行完1后执行2，因为axios是异步操作
+            axios({
+              method: "get",
+              url: "http://192.168.2.201/statistics/userord/"
+            }) //执行get请求
+              .then(function(response) {
+                localStorage.user1 = response.data[0].price;
+                localStorage.user2 = response.data[1].price;
+                localStorage.user3 = response.data[2].price;
+                //console.log(typeof(localStorage.flag))
+                if (localStorage.flag === "1") {
+                  location.reload();
+                  localStorage.flag = 2;
+                }
+                //再执行第三步
+                axios({
+                  method: "get",
+                  url: "http://192.168.2.201/statistics/orderkind/"
+                }) //执行get请求
+                  .then(function(response) {
+                    console.log(response.data); // = 8
+                  }) //处理数据（赋给info
+                  .catch(error => {
+                    console.log(error); //这里应该有错误处理
+                  }); //错误处理
+              }) //处理数据（赋给info
+              .catch(error => {
+                console.log(error); //这里应该有错误处理
+              }); //错误处理
           }) //处理数据（赋给info
           .catch(error => {
             console.log(error); //这里应该有错误处理
@@ -110,7 +228,8 @@ Description:
             chuan: 0
           },
           option1: null,
-          option2: null
+          option2: null,
+          option3: null
         };
       },
       methods: {
@@ -189,6 +308,11 @@ Description:
           let orderChart = echarts.init(document.getElementById("orderChart2"));
           this.getChert2();
           this.option2 = {
+            title: {
+              text: "下单Top3",
+              subtext: "下单金额最高的前三名",
+              left: "center"
+            },
             tooltip: {
               trigger: "axis",
               axisPointer: {
@@ -214,7 +338,7 @@ Description:
             },
             series: [
               {
-                name: "下单前三名",
+                name: "总金额(元)",
                 barWidth: "60%",
                 data: [parseInt(localStorage.user1), parseInt(localStorage.user2), parseInt(localStorage.user3)],
                 type: "bar"
@@ -222,11 +346,74 @@ Description:
             ]
           };
           orderChart.setOption(this.option2, true);
+        },
+        getChert3: function() {
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/statistics/orderkind/"
+          }) //执行get请求
+            .then(function(response) {
+              //取出数据
+            }) //处理数据（赋给info
+            .catch(error => {
+              console.log(error); //这里应该有错误处理
+            }); //错误处理
+        },
+        drawChart3: function() {
+          let orderChart = echarts.init(document.getElementById("orderChart3"));
+          this.getChert3();
+          this.option3 = {
+            title: {
+              text: "近期下单量变化"
+            },
+            tooltip: {
+              trigger: "axis"
+            },
+            legend: {
+              data: ['鲁菜下单总量', '粤菜下单总量', '川菜下单总量']
+            },
+            grid: {
+              left: "3%",
+              right: "4%",
+              bottom: "3%",
+              containLabel: true
+            },
+            xAxis: {
+              type: "category",
+              boundaryGap: false,
+              data: ["20200408", "2020418", "20200422"]
+            },
+            yAxis: {
+              type: "value"
+            },
+            series: [
+              {
+                name: "鲁菜下单总量",
+                type: "line",
+                stack: "下单总量",
+                data: [120, 132, 101]
+              },
+              {
+                name: "粤菜下单总量",
+                type: "line",
+                stack: "下单总量",
+                data: [220, 182, 191]
+              },
+              {
+                name: "川菜下单总量",
+                type: "line",
+                stack: "下单总量",
+                data: [150, 232, 201]
+              }
+            ]
+          };
+          orderChart.setOption(this.option3, true);
         }
       },
       mounted() {
         this.drawChart1();
         this.drawChart2();
+        this.drawChart3();
       }
     };
 
@@ -234,5 +421,7 @@ Description:
     new Ctor().$mount("#toplist");
     var Ctor = Vue.extend(orderChart);
     new Ctor().$mount("#chart");
+    var Ctor = Vue.extend(user);
+    new Ctor().$mount("#user");
   </script>
 </html>

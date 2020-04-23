@@ -81,4 +81,5 @@ Route::prefix('user')->group(function () {
 Route::prefix('statistics')->group(function () {
     Route::get('orderstat/','statistics\orderstat@statorder');
     Route::get('userord/','statistics\orderstat@statuserord');
+    Route::get('orderkind/','statistics\orderstat@orderkind');
 });

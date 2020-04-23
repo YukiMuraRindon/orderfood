@@ -36,9 +36,27 @@ class orderstat extends Controller
         ];
 
     }
-    public $sql = '(select userid,sum(ordprice) from `order` GROUP BY (userid))';
+
     public function statuserord(){
-        $user = DB::select('select userid,sum(ordprice) as price from `order` GROUP BY (userid) ORDER BY price desc');
+        $user = DB::select('
+            select userid,sum(ordprice) as price 
+            from `order` 
+            GROUP BY (userid) 
+            ORDER BY price desc
+            ');
         return $user;
     }
+
+    public function orderkind(){
+        $order = DB::select('
+        SELECT comkind,count(comkind) as num,
+        DATE_FORMAT(orderdate,\'%Y%m%d\') as date 
+        FROM `orderdetail`  
+        group by comkind,date 
+        order by comkind,num desc
+            ');
+        return $order;
+    }
+
 }
+

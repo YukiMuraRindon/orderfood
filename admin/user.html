@@ -35,11 +35,14 @@ Description:
           <el-menu-item index="2"><a href="./order.html">订单管理</a></el-menu-item>
           <el-menu-item index="3"><a href="./user.html">用户管理</a></el-menu-item>
           <el-menu-item index="4"><a href="./trend.html">订单趋势</a></el-menu-item>
-          <el-menu-item index="5"><a href="#">数据统计</a></el-menu-item>
         </el-menu>
       </div>
       <div id="user">
-        <el-avatar class="block"><el-avatar :size="41" :src="circleUrl"></el-avatar></el-avatar>
+          <p style="margin-right:40px; text-align: center; float: right;">
+              欢迎您：{{ nick }}
+              <el-button type="text" @click="logout">注销</el-button>
+          </p>
+          <img src="./img/userlogo.png" alt="userlogo" style="width:50px;height:50px;" />
       </div>
     </div>
     <!--数据加载-->
@@ -141,6 +144,35 @@ Description:
   </body>
   <script>
     var toplist = {
+      beforeCreate() {
+        //实例化之前先验证是否是管理员
+        if (localStorage.token == null) {
+          this.admin = false;
+          alert('请先登录！！！')
+          location.href='../index.html'
+        } else {
+          axios({
+            method: "post",
+            url: "http://192.168.2.201/login/check",
+            data: {
+              token: localStorage.token
+            }
+          }) //执行get请求
+            .then(function(response) {
+              localStorage.islogin = "yes";
+              if (response.data.status == "2") {
+                this.admin = true;
+                //console.log(this.admin);
+              }else {
+                alert('请用管理员账号登录！！！')
+                location.href='../index.html'
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            }); //错误处理
+        }
+      },
       data() {
         return {
           activeIndex: "3",
@@ -154,13 +186,50 @@ Description:
       }
     };
     var user = {
+      beforeCreate() {
+        if (localStorage.islogin == null) {
+          localStorage.islogin = "no";
+        }else if(localStorage.islogin == "yes")
+          this.islogin = true;
+        if (localStorage.nickname == null) {
+          localStorage.nickname = "Guest";
+        }else if(localStorage.nickname === "rindon"){
+          this.admin = true;
+          //console.log(this.admin);
+          //建议改成后端请求验证
+        }
+      },
       data() {
         return {
-          circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+          circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+          nick: localStorage.nickname,
         };
       },
       methods: {
-
+        logout: function() {
+          if (localStorage.token == null) {
+            localStorage.removeItem("nickname");
+            localStorage.removeItem("token");
+            location.reload();
+          } else {
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/login/logout",
+              data: {
+                token: localStorage.token
+              }
+            }) //执行get请求
+              .then(function(response) {
+                localStorage.removeItem("nickname");
+                localStorage.removeItem("token");
+                localStorage.islogin = "no";
+                location.reload();
+              })
+              .catch(error => {
+                console.log(error);
+              }); //错误处理
+          }
+        }
       }
     };
     var data = {
