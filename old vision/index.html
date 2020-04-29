@@ -1,0 +1,808 @@
+<!--
+Created: 2020-03-26 14:14:22
+Last Modified:2020-03-31 11:09:35
+Filename:index.html
+Project:Hotel reservation system
+Author : YukiMuraRindon
+Email : rinndonn@outlook.com
+--------------------------------------------------------
+Description: 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="YukiMuraRindon" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1" />
+    <link rel="Website icon" href="./img/favicon.ico" type="image/x-icon" />
+    <title>订餐系统</title>
+  </head>
+  <!--引入组件-->
+  <script src="./lib/vue.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <link href="./css/style.css" type="text/css" rel="stylesheet" />
+  <script src="./lib/axios.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
+  <script src="https://unpkg.com/vuex@3.1.3/dist/vuex.js"></script>
+  <body>
+    <!--顶部菜单-->
+    <div class="head">
+      <div>
+        <img src="./img/logo.jpg" id="img" />
+      </div>
+
+      <div id="toplist">
+        <el-menu :default-active="activeIndex" class="el-menu" mode="horizontal" active-text-color="#ffffffs">
+          <el-menu-item index="1">菜品展示</el-menu-item>
+          <el-menu-item index="2" @click="shoppingcart = true">我的购物车</el-menu-item>
+          <el-menu-item index="3" @click="orderlist">订单管理</el-menu-item>
+        </el-menu>
+        <!--购物车抽屉-->
+        <el-drawer
+          title="已加入购物车的商品总览："
+          :visible.sync="shoppingcart"
+          direction="rtl"
+          size="65%"
+          :before-close="closedrawer"
+          @open="open()"
+          ref="drawer"
+        >
+          <el-table :data="cartData">
+            <el-table-column property="comname" label="菜名" width="100"></el-table-column>
+            <el-table-column property="comkind" label="种类" width="100"></el-table-column>
+            <el-table-column property="comprice" label="单价" width="100"></el-table-column>
+            <el-table-column property="number" label="数量"></el-table-column>
+            <el-table-column property="sumprice" label="小计"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button type="danger" @click="del(scope.row.comid)">
+                  删除
+                  <i class="el-icon-delete2 el-icon--right"></i>
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-button type="primary" style="float: right;margin-right: 19px;margin-top: 25px;" @click="order(cartData)">
+            下单
+          </el-button>
+          <span style="float: right;margin-right: 19px;margin-top: 35px;">总价格：{{ allprice }}元</span>
+        </el-drawer>
+        <!--订单总览-->
+        <!--遮罩是订单管理的问题-->
+        <el-drawer
+          title="订单总览："
+          :visible.sync="orderdrawer"
+          direction="rtl"
+          size="65%"
+          ref="drawer"
+          :modal="false"
+        >
+          <el-table :data="orderData" style="min-width:800px;">
+            <el-table-column property="orderid" label="订单编号" width="50"></el-table-column>
+            <el-table-column property="ordprice" label="订单价格" width="100"></el-table-column>
+            <el-table-column property="ordstatus" label="订单状态" width="100"></el-table-column>
+            <el-table-column property="sentstatus" label="配送状态" width="80"></el-table-column>
+            <el-table-column property="orddate" label="下单时间"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button type="primary" @click="orderdetail(scope.row.orderid)">
+                  订单详情
+                </el-button>
+                <el-button type="primary" @click="orderfinish(scope.row)">
+                  确认收货
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-drawer>
+        <!-- Table -->
+        <el-dialog title="订单详情" :visible.sync="orderVisible" style="min-width: 300px;" style="z-index:2006">
+          <el-table :data="orderdetaildata">
+            <el-table-column prop="comname" label="商品名称" width="150"></el-table-column>
+            <el-table-column prop="comkind" label="商品种类"></el-table-column>
+            <el-table-column prop="comnum" label="商品数量"></el-table-column>
+            <el-table-column prop="orderdate" label="下单时间" width="160"></el-table-column>
+          </el-table>
+        </el-dialog>
+      </div>
+
+      <div id="user" style="margin-right:40px;">
+        <p style="margin-right:40px; text-align: center; display: inline;">
+          欢迎您：{{ nick }}
+          <el-button type="text" v-if="islogin == true" @click="logout">注销</el-button>
+          <el-button type="text" v-if="admin == true " @click="toAdmin()">进入后台</el-button>
+        </p>
+        <img src="./img/userlogo.png" alt="userlogo" style="width:50px;height:50px;" @click="popbutton" />
+        <el-popover placement="top" width="160" v-model="pop">
+          <div style="text-align: right; margin: 0">
+            <el-button size="mini" @click="loginForm = true">登 录</el-button>
+            <el-button type="primary" size="mini" @click="registForm = true">注 册</el-button>
+          </div>
+        </el-popover>
+        <!-- 登录表单 -->
+        <el-dialog title="登录系统" :visible.sync="loginForm" style="text-align:left" :modal-append-to-body="false">
+          <el-form :model="LoginForm">
+            <el-form-item label="用户名" :label-width="formLabelWidth">
+              <el-input v-model="LoginForm.username" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" :label-width="formLabelWidth">
+              <el-input v-model="LoginForm.password" autocomplete="off" show-password></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click.stop="clickcancal()">取 消</el-button>
+            <el-button type="primary" @click="clicklogin()">登 录</el-button>
+          </div>
+        </el-dialog>
+        <!-- 注册表单 -->
+        <el-dialog title="注册会员" :visible.sync="registForm" style="text-align:left" :modal-append-to-body="false">
+          <el-form :model="RegistForm">
+            <el-form-item label="用户名" :label-width="formLabelWidth">
+              <el-input v-model="RegistForm.username" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" :label-width="formLabelWidth">
+              <el-input v-model="RegistForm.password" autocomplete="off" show-password></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" :label-width="formLabelWidth">
+              <el-input v-model="RegistForm.repassword" autocomplete="off" show-password></el-input>
+            </el-form-item>
+            <el-form-item label="昵称" :label-width="formLabelWidth">
+              <el-input v-model="RegistForm.nickname" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="地址" :label-width="formLabelWidth">
+              <el-input v-model="RegistForm.address" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="电话号码" :label-width="formLabelWidth">
+              <el-input v-model="RegistForm.telephone" autocomplete="off"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click.stop="clickcancal()">取 消</el-button>
+            <el-button type="primary" @click="clickregist()">注 册</el-button>
+          </div>
+        </el-dialog>
+      </div>
+    </div>
+
+    <hr id="line" />
+
+    <!--左侧菜单-->
+    <div id="body">
+      <div id="leftlist">
+        <el-row class="tac">
+          <el-col>
+            <el-menu :default-active="activeIndex">
+              <el-menu-item index="1" v-on:click="selectall">
+                <i class="el-icon-food"></i>
+                <span slot="title">全部菜系</span></el-menu-item
+              ><el-menu-item index="2" v-on:click="selectlu">
+                <i class="el-icon-dish-1"></i>
+                <span slot="title">鲁菜</span> </el-menu-item
+              ><el-menu-item index="3" v-on:click="selectchuan">
+                <i class="el-icon-dish"></i>
+                <span slot="title">川菜</span>
+              </el-menu-item>
+              <el-menu-item index="4" v-on:click="selectyue">
+                <i class="el-icon-dish-1"></i>
+                <span slot="title">粤菜</span>
+              </el-menu-item>
+              <el-menu-item index="5">
+                <i class="el-icon-dish"></i>
+                <span slot="title">苏菜</span>
+              </el-menu-item>
+              <el-menu-item index="6">
+                <i class="el-icon-dish-1"></i>
+                <span slot="title">闽菜</span>
+              </el-menu-item>
+              <el-menu-item index="7">
+                <i class="el-icon-dish"></i>
+                <span slot="title">浙菜</span>
+              </el-menu-item>
+              <el-menu-item index="8">
+                <i class="el-icon-dish-1"></i>
+                <span slot="title">徽菜</span>
+              </el-menu-item>
+              <el-menu-item index="9">
+                <i class="el-icon-dish"></i>
+                <span slot="title">湘菜</span>
+              </el-menu-item>
+            </el-menu>
+          </el-col>
+        </el-row>
+      </div>
+      <!--展示卡片-->
+      <div id="cards">
+        <el-scrollbar :native="false" tag="section" style="height:100%;">
+          <el-row>
+            <el-col :span="8" v-for="commodity in info" class="commodity" :key="commodity.comid">
+              <el-card>
+                <img :src="commodity.comimg" class="image" />
+                <div style="padding: 14px;height: 200px;">
+                  <el-scrollbar :native="false" tag="section" style="height:100%;">
+                    <p>菜名：{{ commodity.comname }}</p>
+                    <p>菜种：{{ commodity.comkind }}</p>
+                    <p>剩余库存：{{ commodity.comstock }}</p>
+                    <p>{{ commodity.comdisc }}</p>
+                    <div class="bottom clearfix">
+                      <span>价格：{{ commodity.comprice }}&nbsp&nbsp&nbsp</span>
+                      <el-button type="text" class="button" @click="addchart(info[commodity.comid-1])"
+                        >加入购物车</el-button
+                      >
+                    </div>
+                  </el-scrollbar>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+        </el-scrollbar>
+      </div>
+    </div>
+
+    <!--底部菜单-->
+    <hr id="line" />
+    <div id="footer">
+      <p>酒店订餐系统 HOTEL RESERVATION SYSTEM © 2020</p>
+      <p>Powered and Maintained by Rindon . All Rights Reserved.</p>
+    </div>
+  </body>
+
+  <script>
+    var toplist = {
+      beforeCreate() {
+        if (typeof localStorage.cart == "undefined") localStorage.cart = null;
+      },
+      data() {
+        return {
+          activeIndex: "1",
+          shoppingcart: false,
+          cartData: JSON.parse(localStorage.cart),
+          orderdrawer: false,
+          orderData: [],
+          orderVisible: false,
+          orderdetaildata: [],
+          allprice: 0.0
+        };
+      },
+      methods: {
+        closedrawer: function() {
+          this.activeIndex = "1";
+          this.shoppingcart = false;
+          //console.log(this.activeIndex);
+        },
+        open() {
+          this.cartData = JSON.parse(localStorage.cart);
+          this.allprice = 0;
+          if (this.cartData) {
+            for (i = 0; i < this.cartData.length; i++) {
+              this.allprice += parseFloat(this.cartData[i].comprice) * parseInt(this.cartData[i].number);
+            }
+          }
+        },
+        orderlist: function() {
+          if (localStorage.islogin == "no") {
+            this.$alert("请先登录！", {
+              confirmButtonText: "确定"
+            });
+          } else {
+            //这里应该打开抽屉
+            axios({
+              method: "get",
+              url: "http://192.168.2.201/order/selectuserorder/" + localStorage.nickname
+            }) //执行get请求
+              .then(res => (this.orderData = res.data)) //处理数据（赋给info
+              .catch(error => {
+                //console.log(res.data);
+                console.log(error);
+              }); //错误处理
+            this.orderdrawer = true;
+            //然后axios查后台展示在表格
+          }
+        },
+        del(comid) {
+          //能获取到id
+          //console.log(comid);
+          let k = 0;
+          let cart1 = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : [];
+          for (let i = 0; i < cart1.length; i++) {
+            let item = cart1[i];
+            //console.log(item.comid);
+            if (item.comid === comid) {
+              //如果有这个对象
+              //console.log(typeof(cart1[i]));
+              //console.log(cart1);
+              cart1.splice(i, 1);
+              //console.log(cart1);
+              //cart1[i].number++; //数量自增
+              //console.log(cart1[1].number);
+              //console.log(typeof(cart1[i].number));
+              break;
+            } else {
+              k = k + 1;
+            }
+          }
+          localStorage.setItem("cart", JSON.stringify(cart1));
+          this.$alert("删除成功！", {
+            confirmButtonText: "确定"
+          });
+          this.cartData = JSON.parse(localStorage.cart);
+          this.allprice = 0;
+          for (i = 0; i < this.cartData.length; i++) {
+            this.allprice += parseFloat(this.cartData[i].comprice) * parseInt(this.cartData[i].number);
+          }
+        },
+        order: function(cartData) {
+          //console.log(cartData);
+          if (localStorage.islogin == "no") {
+            this.$alert("请先登录！", {
+              confirmButtonText: "确定"
+            });
+          } else if (this.cartData == null) {
+            this.$alert("请先加购！", {
+              confirmButtonText: "确定"
+            });
+          } else {
+            //如何下单？循环发送axios？
+
+            //console.log(length);
+            const that = this;
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/order/setorder",
+              data: {
+                nickname: localStorage.nickname,
+                ordprice: this.allprice,
+                ordstatus: "payed",
+                sentstatus: "waiting"
+              }
+            }) //执行get请求
+              .then(function(response) {
+                //返回orderid,发送detail
+                //暂略axios
+                //console.log(response.data.orderid);
+                //console.log(this.cartData.length);
+                let cartData1 = that.cartData;
+                console.log(cartData1[0].comid);
+                for (i = 0; i < Object.keys(cartData1).length; i++) {
+                  axios({
+                    method: "post",
+                    url: "http://192.168.2.201/order/setorderdetail",
+                    data: {
+                      orderid: response.data.orderid,
+                      comid: cartData1[i].comid,
+                      comname: cartData1[i].comname,
+                      comkind: cartData1[i].comkind,
+                      comnum: cartData1[i].number
+                    }
+                  }) //执行get请求
+                    .then(function(response) {
+                      if (response.data.error_code == 0) {
+                        console.log(response.data);
+                      }
+                    }) //处理数据（赋给info
+                    .catch(error => {
+                      console.log(error);
+                    }); //错误处理
+                }
+                that.$alert("下单成功！", {
+                  confirmButtonText: "确定"
+                });
+                that.cartData = null;
+                localStorage.cart = null;
+                that.allprice = 0;
+                that.orderdrawer = false;
+              })
+              .catch(error => {
+                console.log(error);
+              }); //错误处理
+          }
+        },
+        orderdetail: function(orderid) {
+          this.orderVisible = true;
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/order/selectorderdetail/" + orderid
+          }) //执行get请求
+            .then(res => (this.orderdetaildata = res.data)) //处理数据（赋给info
+            .catch(error => {
+              //console.log(res.data);
+              console.log(error);
+            }); //错误处理
+        },
+        orderfinish: function(row) {
+          if (row.sentstatus == "finish") {
+            this.$alert("订单已完成！", {
+              confirmButtonText: "确定"
+            });
+          } else if (row.sentstatus == "sending") {
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/order/finishorder/",
+              data: {
+                orderid: row.orderid
+              }
+            }) //执行get请求
+              .then(res => (row.sentstatus = "finish")) //处理数据（赋给info
+              .catch(error => {
+                //console.log(res.data);
+                console.log(error);
+              }); //错误处理
+            this.$alert("订单收货成功！", {
+              confirmButtonText: "确定"
+            });
+          } else if (row.sentstatus == "waiting") {
+            this.$alert("尚未发货，请稍等！", {
+              confirmButtonText: "确定"
+            });
+          }
+        }
+      },
+      watch: {},
+      mounted() {
+        this.$refs.drawer.open(); //方法
+      }
+    };
+    var user = {
+      beforeCreate() {
+        if (localStorage.islogin == null) {
+          localStorage.islogin = "no";
+        }else if(localStorage.islogin == "yes")
+          this.islogin = true;
+        if (localStorage.nickname == null) {
+          localStorage.nickname = "Guest";
+        }else if(localStorage.nickname === "rindon"){
+          this.admin = true;
+          //console.log(this.admin);
+          //建议改成后端请求验证
+        }
+      },
+      created() {
+        if (localStorage.token == null) {
+          this.admin = false;
+        } else {
+          axios({
+            method: "post",
+            url: "http://192.168.2.201/login/check",
+            data: {
+              token: localStorage.token
+            }
+          }) //执行get请求
+            .then(function(response) {
+              if (response.data.status == "2") {
+                this.admin = true;
+                //console.log(this.admin);
+              }
+            })
+            .catch(error => {
+              //this.admin = false;
+              console.log(error);
+            }); //错误处理
+        }
+      },
+      data() {
+        return {
+          nick: localStorage.nickname,
+          pop: false,
+          loginForm: false,
+          registForm: false,
+          LoginForm: {
+            username: "",
+            password: ""
+          },
+          RegistForm: {
+            username: "",
+            password: "",
+            repassword: "",
+            nickname: "",
+            address: "",
+            telephone: ""
+          },
+          info: null,
+          token: null,
+          formLabelWidth: "120px",
+          circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+        };
+      },
+      methods: {
+        toAdmin:function(){
+          window.location.href='./admin/index.html';
+        },
+        popbutton: function() {
+          if (localStorage.nickname == null || this.nick == "Guest") this.pop = true;
+          else ;
+            //console.log(this.admin);
+        },
+        clicklogin: function() {
+          axios({
+            method: "post",
+            url: "http://192.168.2.201/login/login/",
+            data: {
+              username: this.LoginForm.username, //取值
+              password: this.LoginForm.password
+            }
+          }) //执行get请求
+            .then(response => {
+              this.info = response;
+              this.token = this.info.data.token;
+              // console.log(this.info);
+              //console.log(this.info.data);
+              //console.log(this.info.data.token);
+              if (this.info.data.error_code == "1") {
+                this.$alert(response.message, this.info.data.message, {
+                  confirmButtonText: "确定"
+                });
+                this.LoginForm.password = "";
+              } else if (this.info.data.status == 1) {
+                //如果登录成功且是普通用户
+                //console.log("欢迎用户"+this.info.data[0].username);
+                this.nick = this.info.data.nickname;
+                this.$alert(response.message, "登录成功！", {
+                  confirmButtonText: "确定"
+                });
+                localStorage.islogin = "yes";
+                localStorage.nickname = this.nick;
+                localStorage.token = this.token;
+                this.pop = false;
+                this.loginForm = false;
+              } else if (this.info.data.status == 2) {
+                //如果是管理员
+                //console.log("欢迎管理员"+this.info.data[0].nickname);
+                this.admin = true;
+                this.nick = this.info.data.nickname;
+                this.$alert(response.message, "登录成功！", {
+                  confirmButtonText: "确定"
+                });
+                localStorage.islogin = "yes";
+                localStorage.nickname = this.nick;
+                localStorage.token = this.token;
+                this.pop = false;
+                this.loginForm = false;
+              }
+
+              //this.get("all"); //插入完毕刷新页面
+              //console.log(response);
+            }) //处理数据（赋给info
+            .catch(error => {
+              console.log(error); //这里应该有错误处理
+            }); //错误处理
+        },
+        clickregist: function() {
+          //点击了注册之后
+          //先检查：密码和确认密码，电话号码全为数字
+          if (this.RegistForm.password != this.RegistForm.repassword) {
+            this.$alert("两次密码输入不一致！", "请检查输入内容！", {
+              confirmButtonText: "确定"
+            });
+          } else if (isNaN(this.RegistForm.telephone)) {
+            this.$alert("电话号码只能为数字！", "请检查输入内容！", {
+              confirmButtonText: "确定"
+            });
+          } else {
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/login/regist",
+              data: {
+                username: this.RegistForm.username,
+                password: this.RegistForm.password,
+                nickname: this.RegistForm.nickname,
+                address: this.RegistForm.address,
+                telephone: this.RegistForm.telephone
+              }
+            }) //执行get请求
+              .then(function(response) {
+                //执行完了应该标记登录状态
+                console.log(response);
+                localStorage.islogin = "yes";
+                localStorage.nickname = response.data.nickname;
+                localStorage.token = response.data.token;
+              })
+              .catch(error => {
+                this.$alert("注册失败，请联系管理员", "注册失败！", {
+                  confirmButtonText: "确定"
+                });
+                console.log(error);
+              }); //错误处理
+            location.reload();
+            this.$alert("注册成功，欢迎您", "注册成功！", {
+              confirmButtonText: "确定"
+            });
+            this.pop = false;
+            this.registForm = false;
+          }
+        },
+        clickcancal: function() {
+          this.pop = false;
+          this.registForm = false;
+          this.loginForm = false;
+        },
+        isAdmin: function() {
+          if (localStorage.token == null) {
+            this.admin = false;
+          } else {
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/login/check",
+              data: {
+                token: localStorage.token
+              }
+            }) //执行get请求
+              .then(function(response) {
+                localStorage.islogin = "yes";
+                if (response.data.status == "2") {
+                  this.admin = true;
+                  //console.log(this.admin);
+                }
+              })
+              .catch(error => {
+                console.log(error);
+              }); //错误处理
+          }
+        },
+        logout: function() {
+          if (localStorage.token == null) {
+            localStorage.removeItem("nickname");
+            localStorage.removeItem("token");
+            location.reload();
+          } else {
+            axios({
+              method: "post",
+              url: "http://192.168.2.201/login/logout",
+              data: {
+                token: localStorage.token
+              }
+            }) //执行get请求
+              .then(function(response) {
+                localStorage.removeItem("nickname");
+                localStorage.removeItem("token");
+                localStorage.islogin = "no";
+                location.reload();
+              })
+              .catch(error => {
+                console.log(error);
+              }); //错误处理
+          }
+        }
+      },
+      watch: {}
+    };
+    var body = {
+      data() {
+        return {
+          activeIndex: "1",
+          info: null,
+          params: "all"
+        };
+      },
+      methods: {
+        selectall: function() {
+          this.activeIndex = "1";
+          this.get("all");
+          //console.log('click 1');
+        },
+        selectlu: function() {
+          this.activeIndex = "2";
+          this.get("lu");
+          //console.log('click 2');
+        },
+        selectchuan: function() {
+          this.activeIndex = "3";
+          this.get("chuan");
+          //console.log('click 3');
+        },
+        selectyue: function() {
+          this.activeIndex = "4";
+          this.get("yue");
+          //console.log('click 4');
+        },
+        addchart: function(row) {
+          // //先判断是否登录，再加表
+          // if(localStorage.islogin == "no"){
+          //   this.$alert("尚未登录！", "请先登录再添加商品！", {
+          //     confirmButtonText: "确定"
+          //   });
+          // }
+          // else{
+          //   //如果登录后再添加商品
+          // }
+
+          //添加到localstorge
+          //步骤：1、查重，2、加数量，3、push  row.id可用
+          //console.log(this.row.comid);
+          //先检查有没有对象
+          if (localStorage.cart == "null") {
+            let cart1 = [];
+            let cart = {
+              comid: row.comid,
+              comname: row.comname,
+              comkind: row.comkind,
+              comprice: row.comprice
+            };
+            cart.number = 1;
+            cart.sumprice = cart.comprice;
+            cart1.push(cart);
+            localStorage.setItem("cart", JSON.stringify(cart1));
+            this.$alert("添加成功！", {
+              confirmButtonText: "确定"
+            });
+            //console.log("null!");
+          } else {
+            //onsole.log(localStorage.cart);
+            let k = 0;
+            let flag = 0;
+            let cart1 = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : [];
+            for (let i = 0; i < cart1.length; i++) {
+              let item = cart1[i];
+              //console.log(item.comid);
+              if (item.comid === row.comid) {
+                //如果有这个对象
+                //console.log(cart1[i].number);
+                cart1[i].number++; //数量自增
+                //console.log(cart1[1].number);
+                //console.log(typeof(cart1[i].number));
+                flag = 1;
+                break;
+              } else {
+                k = k + 1;
+              }
+            }
+            //console.log("判断结束了,标志为"+flag);
+            if (flag == 0) {
+              //如果无重复则生成对象
+              //console.log("开始生成了");
+              let cart = {
+                comid: row.comid,
+                comname: row.comname,
+                comkind: row.comkind,
+                comprice: row.comprice
+              };
+              cart.number = 1;
+              cart.sumprice = cart.comprice;
+              cart1.push(cart);
+            }
+            localStorage.setItem("cart", JSON.stringify(cart1));
+            this.$alert("添加成功！", {
+              confirmButtonText: "确定"
+            });
+          }
+
+          //console.log(localStorage.cart);
+
+          //这里应该先判断是否已存在，再执行添加操作
+          //如何判断存在？传入row.comid，然后用js原生操作返回布尔值。若存在则num++
+          //如何添加？先给对象加入num字段，然后进入数组
+
+          //先不验证，先试着加入
+          //先加购物车表试试吧
+        },
+        get: function(params) {
+          axios({
+            method: "get",
+            url: "http://192.168.2.201/commodity/select/" + params
+          }) //执行get请求
+            .then(res => (this.info = res.data)) //处理数据（赋给info
+            .catch(error => {
+              console.log(error);
+            }); //错误处理
+        }
+      },
+      mounted() {
+        axios({
+          method: "get",
+          url: "http://192.168.2.201/commodity/select/" + this.params
+        }) //执行get请求
+          .then(res => (this.info = res.data)) //处理数据（赋给info
+          .catch(error => {
+            console.log(error);
+          }); //错误处理
+      }
+    };
+    var Ctor = Vue.extend(toplist);
+    new Ctor().$mount("#toplist");
+    var Ctor = Vue.extend(body);
+    new Ctor().$mount("#body");
+    var Ctor = Vue.extend(user);
+    new Ctor().$mount("#user");
+  </script>
+</html>
