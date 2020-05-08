@@ -18,6 +18,12 @@ Description:
     <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1" />
     <link rel="Website icon" href="img/favicon.ico" type="image/x-icon" />
     <title>后台管理界面</title>
+    <script>
+      if (localStorage.token == null) {
+        alert("请先登录！！！");
+        location.href = "../index.html";
+      }
+    </script>
   </head>
   <!--引入组件，缺少axios-->
   <script src="lib/vue.js"></script>
@@ -163,8 +169,8 @@ Description:
         //实例化之前先验证是否是管理员
         if (localStorage.token == null) {
           this.admin = false;
-          alert('请先登录！！！')
-          location.href='../index.html'
+          alert("请先登录！！！");
+          location.href = "../index.html";
         } else {
           axios({
             method: "post",
@@ -178,9 +184,9 @@ Description:
               if (response.data.status == "2") {
                 this.admin = true;
                 //console.log(this.admin);
-              }else {
-                alert('请用管理员账号登录！！！')
-                location.href='../index.html'
+              } else {
+                alert("请用管理员账号登录！！！");
+                location.href = "../index.html";
               }
             })
             .catch(error => {
