@@ -296,8 +296,8 @@ export default {
             // 暂略axios
             // console.log(response.data.orderid);
             // console.log(this.cartData.length);
-            let cartData1 = that.cartDat
-            console.log(cartData1[0].comid)
+            let cartData1 = that.cartData
+            // console.log(cartData1[0].comid)
             for (let i = 0; i < Object.keys(cartData1).length; i++) {
               axios({
                 method: 'post',

@@ -1,0 +1,6 @@
+INSERT INTO `user`(`userid`, `username`, `password`, `nickname`, `address`, `tel`, `status`, `useraddtime`, `usernote`) VALUES (4, 'rindon', '123456', 'rindon', 'testplace', '13333333333', 2, '2020-03-28 23:03:37', NULL);
+INSERT INTO `user`(`userid`, `username`, `password`, `nickname`, `address`, `tel`, `status`, `useraddtime`, `usernote`) VALUES (5, 'zhang', '12121', 'sjsj', 'sjsjsjsj', '121212121', 1, '2020-04-05 15:06:39', NULL);
+INSERT INTO `user`(`userid`, `username`, `password`, `nickname`, `address`, `tel`, `status`, `useraddtime`, `usernote`) VALUES (6, 'sjsjsj', '129192192', 'jwjwjdj', 'idjeince', '12334321', 1, '2020-04-05 15:06:48', NULL);
+INSERT INTO `user`(`userid`, `username`, `password`, `nickname`, `address`, `tel`, `status`, `useraddtime`, `usernote`) VALUES (7, 'jidjidwo', 'jicnei', '192839', 'niceni', '29389', 1, '2020-04-05 15:06:57', NULL);
+INSERT INTO `user`(`userid`, `username`, `password`, `nickname`, `address`, `tel`, `status`, `useraddtime`, `usernote`) VALUES (13, 'qd2qd', 'q2dqdwdq', '2de3fqf3efq', '3qeqc13c', '222323232', 1, '2020-04-06 11:04:12', NULL);
+INSERT INTO `user`(`userid`, `username`, `password`, `nickname`, `address`, `tel`, `status`, `useraddtime`, `usernote`) VALUES (25, 'liuneng', '123123', 'liuneng', 'liuneng', '1333131313', 1, '2020-04-16 09:23:13', NULL);
